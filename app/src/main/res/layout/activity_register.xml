@@ -196,6 +196,7 @@
             android:textSize="16sp" />
 
         <Button
+            android:id="@+id/btnRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="70dp"
@@ -212,7 +213,7 @@
             android:layout_centerVertical="true"
             android:elevation="10dp"
             android:visibility="gone" />
-        
+
     </RelativeLayout>
 
 </ScrollView>
