@@ -1,24 +1,41 @@
 package com.example.pixcy;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.example.pixcy.databinding.ActivityRegisterBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.auth.FirebaseUser;
+
+import java.util.Objects;
 
 public class Register_Activity extends AppCompatActivity {
 
     private ActivityRegisterBinding activityRegisterBinding;
     private RadioButton rbRegisterGenderSelected;
+    public static final String TAG = "Register_Activity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Set or remove the title
+        getSupportActionBar().setTitle("User Registration");
 
         activityRegisterBinding = ActivityRegisterBinding.inflate(getLayoutInflater());
         View view = activityRegisterBinding.getRoot();
@@ -59,32 +76,32 @@ public class Register_Activity extends AppCompatActivity {
                     activityRegisterBinding.etRegisterEmail.requestFocus();
                 } else if (!Patterns.EMAIL_ADDRESS.matcher(textEmail).matches()){
                     Toast.makeText(Register_Activity.this, "Please re-enter your email", Toast.LENGTH_SHORT).show();
-                    activityRegisterBinding.etRegisterUsername.setError("Valid email is required");
-                    activityRegisterBinding.etRegisterUsername.requestFocus();
+                    activityRegisterBinding.etRegisterEmail.setError("Valid email is required");
+                    activityRegisterBinding.etRegisterEmail.requestFocus();
                 } else if (TextUtils.isEmpty(textDOB)){
                     Toast.makeText(Register_Activity.this, "Please enter your date of birth", Toast.LENGTH_SHORT).show();
                     activityRegisterBinding.etRegisterDOB.setError("Date of birth is required");
                     activityRegisterBinding.etRegisterDOB.requestFocus();
-                } else if (activityRegisterBinding.rgRegisterGender.getCheckedRadioButtonId() == -1){
+                } else if (activityRegisterBinding.rgRegisterGender.getCheckedRadioButtonId() == -1) {
                     Toast.makeText(Register_Activity.this, "Please select your gender", Toast.LENGTH_SHORT).show();
-                    activityRegisterBinding.etRegisterUsername.setError("Gender is required");
-                    activityRegisterBinding.etRegisterUsername.requestFocus();
+                    activityRegisterBinding.tvRegisterGender.setError("Gender is required");
+                    activityRegisterBinding.tvRegisterGender.requestFocus();
                 } else if (TextUtils.isEmpty(textPassword)) {
                     Toast.makeText(Register_Activity.this, "Please enter your password", Toast.LENGTH_SHORT).show();
-                    activityRegisterBinding.etRegisterUsername.setError("Password is required");
-                    activityRegisterBinding.etRegisterUsername.requestFocus();
+                    activityRegisterBinding.etRegisterPassword.setError("Password is required");
+                    activityRegisterBinding.etRegisterPassword.requestFocus();
                 } else if (textPassword.length() < 6) {
                     Toast.makeText(Register_Activity.this, "Password should be at least 6 digits", Toast.LENGTH_SHORT).show();
-                    activityRegisterBinding.etRegisterUsername.setError("Password is too weak");
-                    activityRegisterBinding.etRegisterUsername.requestFocus();
+                    activityRegisterBinding.etRegisterPassword.setError("Password is too weak");
+                    activityRegisterBinding.etRegisterPassword.requestFocus();
                 } else if (TextUtils.isEmpty(textConfirmPassword)) {
                     Toast.makeText(Register_Activity.this, "Please confirm your password", Toast.LENGTH_SHORT).show();
-                    activityRegisterBinding.etRegisterUsername.setError("Password confirmation is required");
-                    activityRegisterBinding.etRegisterUsername.requestFocus();
-                } else if (textPassword.equals(textConfirmPassword)) {
+                    activityRegisterBinding.etRegisterConfirmPassword.setError("Password confirmation is required");
+                    activityRegisterBinding.etRegisterConfirmPassword.requestFocus();
+                } else if (!textPassword.equals(textConfirmPassword)) {
                     Toast.makeText(Register_Activity.this, "Please re-enter your passwords and ensure they are the same", Toast.LENGTH_SHORT).show();
-                    activityRegisterBinding.etRegisterUsername.setError("Ensure your passwords are the same");
-                    activityRegisterBinding.etRegisterUsername.requestFocus();
+                    activityRegisterBinding.etRegisterConfirmPassword.setError("Ensure your passwords are the same");
+                    activityRegisterBinding.etRegisterConfirmPassword.requestFocus();
                     // clear the entered passwords
                     activityRegisterBinding.etRegisterPassword.clearComposingText();
                     activityRegisterBinding.etRegisterConfirmPassword.clearComposingText();
@@ -97,10 +114,45 @@ public class Register_Activity extends AppCompatActivity {
         });
     }
 
-
-    
     // Register User using the credentials given
     private void registerUser(String textFullName, String textUsername, String textEmail, String textDOB, String textGender, String textPassword) {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        auth.createUserWithEmailAndPassword(textEmail, textPassword).addOnCompleteListener(Register_Activity.this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(Register_Activity.this, "User registered successfully", Toast.LENGTH_SHORT).show();
+                    FirebaseUser firebaseUser = auth.getCurrentUser();
 
+                    /*// Send Verification Email
+                    firebaseUser.sendEmailVerification();
+
+                    // Open User Profile after successful registration
+                    Intent intent = new Intent(Register_Activity.this, MainActivity.class);
+                    // To prevent user from returning back to Register Activity on pressing back button after registration.
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish(); // to close Register Activity*/
+                } else {
+                    try {
+                        throw Objects.requireNonNull(task.getException());
+                    } catch (FirebaseAuthWeakPasswordException e) {
+                        activityRegisterBinding.etRegisterPassword.setError("Your password is too weak." +
+                                "Kindly use a mix of alphabets, numbers, and special characters.");
+                        activityRegisterBinding.etRegisterPassword.requestFocus();
+                    } catch (FirebaseAuthInvalidCredentialsException e) {
+                        activityRegisterBinding.etRegisterEmail.setError("Your email is invalid or already in use. Kindly re-enter.");
+                        activityRegisterBinding.etRegisterEmail.requestFocus();
+                    } catch (FirebaseAuthUserCollisionException e) {
+                        activityRegisterBinding.etRegisterEmail.setError("User is already registered with this email. Use another email.");
+                        activityRegisterBinding.etRegisterEmail.requestFocus();
+                    } catch (Exception e) {
+                        Log.e(TAG, e.getMessage());
+                        Toast.makeText(Register_Activity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        activityRegisterBinding.pgLoading.setVisibility(View.GONE);
+                    }
+                }
+            }
+        });
     }
 }

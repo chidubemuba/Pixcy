@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "930307855557",
+    "project_id": "pixcy-13848",
+    "storage_bucket": "pixcy-13848.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:930307855557:android:884c90e5c684a1474dccac",
+        "android_client_info": {
+          "package_name": "com.example.pixcy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "930307855557-1lfd98jalja7r4shf7qt2lggiq40rpuj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIC_nX5244O60PEZohisWcIorZ1FLaYW4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "930307855557-1lfd98jalja7r4shf7qt2lggiq40rpuj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
