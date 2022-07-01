@@ -21,6 +21,9 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Objects;
 
@@ -66,19 +69,19 @@ public class Register_Activity extends AppCompatActivity {
                     Toast.makeText(Register_Activity.this, "Please enter your full name", Toast.LENGTH_SHORT).show();
                     activityRegisterBinding.etRegisterFullName.setError("Full name is required");
                     activityRegisterBinding.etRegisterFullName.requestFocus();
-                } else if (TextUtils.isEmpty(textUsername)){
+                } else if (TextUtils.isEmpty(textUsername)) {
                     Toast.makeText(Register_Activity.this, "Please enter your username", Toast.LENGTH_SHORT).show();
                     activityRegisterBinding.etRegisterUsername.setError("Username is required");
                     activityRegisterBinding.etRegisterUsername.requestFocus();
-                } else if (TextUtils.isEmpty(textEmail)){
+                } else if (TextUtils.isEmpty(textEmail)) {
                     Toast.makeText(Register_Activity.this, "Please enter your email", Toast.LENGTH_SHORT).show();
                     activityRegisterBinding.etRegisterEmail.setError("Email is required");
                     activityRegisterBinding.etRegisterEmail.requestFocus();
-                } else if (!Patterns.EMAIL_ADDRESS.matcher(textEmail).matches()){
+                } else if (!Patterns.EMAIL_ADDRESS.matcher(textEmail).matches()) {
                     Toast.makeText(Register_Activity.this, "Please re-enter your email", Toast.LENGTH_SHORT).show();
                     activityRegisterBinding.etRegisterEmail.setError("Valid email is required");
                     activityRegisterBinding.etRegisterEmail.requestFocus();
-                } else if (TextUtils.isEmpty(textDOB)){
+                } else if (TextUtils.isEmpty(textDOB)) {
                     Toast.makeText(Register_Activity.this, "Please enter your date of birth", Toast.LENGTH_SHORT).show();
                     activityRegisterBinding.etRegisterDOB.setError("Date of birth is required");
                     activityRegisterBinding.etRegisterDOB.requestFocus();
@@ -107,7 +110,7 @@ public class Register_Activity extends AppCompatActivity {
                     activityRegisterBinding.etRegisterConfirmPassword.clearComposingText();
                 } else {
                     textGender = rbRegisterGenderSelected.getText().toString();
-                    activityRegisterBinding.pgLoading.setVisibility(View.VISIBLE);
+                    activityRegisterBinding.progressBar.setVisibility(View.VISIBLE);
                     registerUser(textFullName, textUsername, textEmail, textDOB, textGender, textPassword);
                 }
             }
@@ -117,22 +120,45 @@ public class Register_Activity extends AppCompatActivity {
     // Register User using the credentials given
     private void registerUser(String textFullName, String textUsername, String textEmail, String textDOB, String textGender, String textPassword) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
+        
+        // Create User Profile
         auth.createUserWithEmailAndPassword(textEmail, textPassword).addOnCompleteListener(Register_Activity.this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(Register_Activity.this, "User registered successfully", Toast.LENGTH_SHORT).show();
                     FirebaseUser firebaseUser = auth.getCurrentUser();
 
-                    /*// Send Verification Email
-                    firebaseUser.sendEmailVerification();
+                    // Update display name of user
+                    UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(textFullName).build();
+                    firebaseUser.updateProfile(profileChangeRequest);
 
-                    // Open User Profile after successful registration
-                    Intent intent = new Intent(Register_Activity.this, MainActivity.class);
-                    // To prevent user from returning back to Register Activity on pressing back button after registration.
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish(); // to close Register Activity*/
+                    // Enter User Data into the Firebase Realtime Database.
+                    ReadWriteUserDetails writeUserDetails = new ReadWriteUserDetails(textUsername, textDOB, textGender);
+
+                    // Extracting  User reference from Database for "Registered Users"
+                    DatabaseReference referenceProfile = FirebaseDatabase.getInstance().getReference("Registered Users");
+
+                    referenceProfile.child(firebaseUser.getUid()).setValue(writeUserDetails).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                // Send Verification Email
+                                firebaseUser.sendEmailVerification();
+                                Toast.makeText(Register_Activity.this, "User registered successfully. Please verify your email", Toast.LENGTH_SHORT).show();
+
+                                /*// Open User Profile after successful registration
+                                Intent intent = new Intent(Register_Activity.this, MainActivity.class);
+                                // To prevent user from returning back to Register Activity on pressing back button after registration.
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                                finish(); // to close Register Activity*/
+                            } else {
+                                Toast.makeText(Register_Activity.this, "User registered failed. Please try again", Toast.LENGTH_SHORT).show();
+                            }
+                            // Hide progressBar whether User creation is successful or not.
+                            activityRegisterBinding.progressBar.setVisibility(View.GONE);
+                        }
+                    });
                 } else {
                     try {
                         throw Objects.requireNonNull(task.getException());
@@ -149,8 +175,9 @@ public class Register_Activity extends AppCompatActivity {
                     } catch (Exception e) {
                         Log.e(TAG, e.getMessage());
                         Toast.makeText(Register_Activity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                        activityRegisterBinding.pgLoading.setVisibility(View.GONE);
                     }
+                    // Hide progressBar whether User creation is successful or not.
+                    activityRegisterBinding.progressBar.setVisibility(View.GONE);
                 }
             }
         });
