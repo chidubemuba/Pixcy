@@ -120,7 +120,7 @@ public class Register_Activity extends AppCompatActivity {
     // Register User using the credentials given
     private void registerUser(String textFullName, String textUsername, String textEmail, String textDOB, String textGender, String textPassword) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        
+
         // Create User Profile
         auth.createUserWithEmailAndPassword(textEmail, textPassword).addOnCompleteListener(Register_Activity.this, new OnCompleteListener<AuthResult>() {
             @Override
@@ -146,12 +146,12 @@ public class Register_Activity extends AppCompatActivity {
                                 firebaseUser.sendEmailVerification();
                                 Toast.makeText(Register_Activity.this, "User registered successfully. Please verify your email", Toast.LENGTH_SHORT).show();
 
-                                /*// Open User Profile after successful registration
+                                // Open User Profile after successful registration
                                 Intent intent = new Intent(Register_Activity.this, MainActivity.class);
                                 // To prevent user from returning back to Register Activity on pressing back button after registration.
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
-                                finish(); // to close Register Activity*/
+                                finish(); // to close Register Activity
                             } else {
                                 Toast.makeText(Register_Activity.this, "User registered failed. Please try again", Toast.LENGTH_SHORT).show();
                             }
