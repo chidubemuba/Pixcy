@@ -12,6 +12,8 @@ import android.widget.Toast;
 
 import com.example.pixcy.databinding.ActivityMainBinding;
 import com.example.pixcy.fragments.ComposeFragment;
+import com.example.pixcy.fragments.MapsFragment;
+import com.example.pixcy.fragments.MemoriesFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,15 +43,13 @@ public class MainActivity extends AppCompatActivity {
                         fragment = new ComposeFragment();
                         break;
                     case R.id.action_memories:
-                        // TODO: update fragment
                         Toast.makeText(MainActivity.this, "Memories", Toast.LENGTH_SHORT).show();
-                        fragment = new ComposeFragment();
+                        fragment = new MemoriesFragment();
                         break;
                     case R.id.action_map:
                     default:
-                        // TODO: update fragment
                         Toast.makeText(MainActivity.this, "Map", Toast.LENGTH_SHORT).show();
-                        fragment = new ComposeFragment();
+                        fragment = new MapsFragment();
                         break;
                 }
                 fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
@@ -57,6 +57,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         // Set default selection
-        bottomNavigationView.setSelectedItemId(R.id.action_memories);
+        activityMainBinding.bottomNavigation.setSelectedItemId(R.id.action_memories);
     }
 }

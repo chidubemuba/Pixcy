@@ -159,6 +159,8 @@ public class Register_Activity extends AppCompatActivity {
                     // Enter User Data into the Firebase Realtime Database.
                     ReadWriteUserDetails writeUserDetails = new ReadWriteUserDetails(textUsername, textDOB, textGender);
 
+                    //textUsername, description, created_at, image_url, location
+
                     // Extracting  User reference from Database for "Registered Users"
                     DatabaseReference referenceProfile = FirebaseDatabase.getInstance().getReference("Registered Users");
 

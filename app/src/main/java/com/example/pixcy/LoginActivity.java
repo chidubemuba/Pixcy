@@ -26,9 +26,9 @@ import com.google.firebase.auth.FirebaseUser;
 public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding activityLoginBinding;
-    private ProgressBar progressBar;
     private FirebaseAuth mAuth;
     public static final String TAG = "LoginActivity";
+    private FirebaseUser mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,9 +105,9 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithEmail: success");
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    updateUser(user);
                     Toast.makeText(LoginActivity.this, "Log in successful", Toast.LENGTH_SHORT).show();
-//                    FirebaseUser user = mAuth.getCurrentUser();
-//                    updateUI(user);
                 } else {
                     try {
                         throw task.getException();
@@ -128,5 +128,9 @@ public class LoginActivity extends AppCompatActivity {
                 activityLoginBinding.pbLogin.setVisibility(View.GONE);
             }
         });
+    }
+
+    private void updateUser(FirebaseUser firebaseUser) {
+        mUser = firebaseUser;
     }
 }
