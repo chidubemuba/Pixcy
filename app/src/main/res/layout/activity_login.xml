@@ -36,7 +36,7 @@
             android:textSize="16sp" />
 
         <EditText
-            android:id="@+id/etLoginUsername"
+            android:id="@+id/etLoginEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvLoginEmail"
@@ -51,17 +51,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:layout_below="@+id/etLoginUsername"
+            android:layout_below="@+id/etLoginEmail"
             android:text="Password*"
             android:padding="6dp"
             android:textColor="#555555"
             android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/ivShowHidePassword"
+            android:layout_width="30dp"
+            android:layout_height="32dp"
+            android:layout_below="@+id/tvLoginPassword" />
 
         <EditText
             android:id="@+id/etLoginPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvLoginPassword"
+            android:layout_marginStart="30dp"
             android:hint="Enter password"
             android:inputType="textPassword"
             android:padding="6dp"
@@ -89,6 +96,7 @@
             android:layout_marginLeft="70dp" />
 
         <ProgressBar
+            android:id="@+id/pbLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="?android:attr/progressBarStyleLarge"
@@ -97,63 +105,6 @@
             android:elevation="10dp"
             android:visibility="gone"/>
 
-
     </RelativeLayout>
 
 </ScrollView>
-
-
-
-
-
-
-<!--
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".LoginActivity"
-    android:background="@color/dark_purple">
-
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_centerInParent="true"
-        android:layout_marginStart="98dp"
-        android:layout_marginTop="348dp"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:background="@drawable/border"/>
-
-    <EditText
-        android:id="@+id/etUsername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_centerInParent="true"
-        android:layout_marginStart="99dp"
-        android:layout_marginTop="293dp"
-        android:background="@drawable/border"
-        android:ems="10"
-        android:hint="Username"
-        android:inputType="textPersonName" />
-
-    <Button
-        android:id="@+id/btnLogin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_centerInParent="true"
-        android:layout_marginStart="158dp"
-        android:layout_marginTop="428dp"
-        android:text="Login" />
-
-</RelativeLayout>
--->

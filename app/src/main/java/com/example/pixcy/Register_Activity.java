@@ -3,12 +3,14 @@ package com.example.pixcy;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
@@ -25,12 +27,14 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Calendar;
 import java.util.Objects;
 
 public class Register_Activity extends AppCompatActivity {
 
     private ActivityRegisterBinding activityRegisterBinding;
     private RadioButton rbRegisterGenderSelected;
+    private DatePickerDialog picker;
     public static final String TAG = "Register_Activity";
 
     @Override
@@ -46,6 +50,26 @@ public class Register_Activity extends AppCompatActivity {
 
         // TODO: Radio button for gender
         activityRegisterBinding.rgRegisterGender.clearCheck();
+
+        // Setting up Date picker on EditText
+        activityRegisterBinding.etRegisterDOB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Calendar calendar = Calendar.getInstance();
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+                int month = calendar.get(Calendar.MONTH);
+                int year = calendar.get(Calendar.YEAR);
+
+                // Date picker dialog
+                picker = new DatePickerDialog(Register_Activity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        activityRegisterBinding.etRegisterDOB.setText(dayOfMonth + "/" + (month + 1) + "/" + year);
+                    }
+                }, year, month, day);
+                picker.show();
+            }
+        });
 
         // function that is carried out when registration button is clicked
         activityRegisterBinding.btnRegister.setOnClickListener(new View.OnClickListener() {
@@ -110,7 +134,7 @@ public class Register_Activity extends AppCompatActivity {
                     activityRegisterBinding.etRegisterConfirmPassword.clearComposingText();
                 } else {
                     textGender = rbRegisterGenderSelected.getText().toString();
-                    activityRegisterBinding.progressBar.setVisibility(View.VISIBLE);
+                    activityRegisterBinding.pbRegister.setVisibility(View.VISIBLE);
                     registerUser(textFullName, textUsername, textEmail, textDOB, textGender, textPassword);
                 }
             }
@@ -156,12 +180,12 @@ public class Register_Activity extends AppCompatActivity {
                                 Toast.makeText(Register_Activity.this, "User registered failed. Please try again", Toast.LENGTH_SHORT).show();
                             }
                             // Hide progressBar whether User creation is successful or not.
-                            activityRegisterBinding.progressBar.setVisibility(View.GONE);
+                            activityRegisterBinding.pbRegister.setVisibility(View.GONE);
                         }
                     });
                 } else {
                     try {
-                        throw Objects.requireNonNull(task.getException());
+                        throw task.getException();
                     } catch (FirebaseAuthWeakPasswordException e) {
                         activityRegisterBinding.etRegisterPassword.setError("Your password is too weak." +
                                 "Kindly use a mix of alphabets, numbers, and special characters.");
@@ -177,7 +201,7 @@ public class Register_Activity extends AppCompatActivity {
                         Toast.makeText(Register_Activity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                     // Hide progressBar whether User creation is successful or not.
-                    activityRegisterBinding.progressBar.setVisibility(View.GONE);
+                    activityRegisterBinding.pbRegister.setVisibility(View.GONE);
                 }
             }
         });
