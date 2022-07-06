@@ -44,6 +44,12 @@ public class LoginActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
+//        // Check if user is signed in (non-null) and update UI accordingly.
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        if(currentUser != null){
+//            reload();
+//        }
+
         // Show Hide password using Eye Icon
         activityLoginBinding.ivShowHidePassword.setImageResource(R.drawable.ic_baseline_visibility_off_24);
         activityLoginBinding.ivShowHidePassword.setOnClickListener(new View.OnClickListener() {
@@ -65,6 +71,7 @@ public class LoginActivity extends AppCompatActivity {
         activityLoginBinding.btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                activityLoginBinding.btnLogin.setEnabled(false);
                 String textEmail = activityLoginBinding.etLoginEmail.getText().toString();
                 String textPassword = activityLoginBinding.etLoginPassword.getText().toString();
 
@@ -102,11 +109,15 @@ public class LoginActivity extends AppCompatActivity {
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+                activityLoginBinding.btnLogin.setEnabled(true);
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithEmail: success");
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    updateUser(user);
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+//                    FirebaseUser user = mAuth.getCurrentUser();
+//                    updateUser(user);
                     Toast.makeText(LoginActivity.this, "Log in successful", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
@@ -132,5 +143,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private void updateUser(FirebaseUser firebaseUser) {
         mUser = firebaseUser;
+
     }
 }
