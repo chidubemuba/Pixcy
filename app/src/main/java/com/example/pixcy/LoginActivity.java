@@ -44,11 +44,11 @@ public class LoginActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
-//        // Check if user is signed in (non-null) and update UI accordingly.
-//        FirebaseUser currentUser = mAuth.getCurrentUser();
-//        if(currentUser != null){
-//            reload();
-//        }
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            updateUser(currentUser);
+        }
 
         // Show Hide password using Eye Icon
         activityLoginBinding.ivShowHidePassword.setImageResource(R.drawable.ic_baseline_visibility_off_24);
@@ -113,11 +113,8 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithEmail: success");
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-//                    FirebaseUser user = mAuth.getCurrentUser();
-//                    updateUser(user);
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    updateUser(user);
                     Toast.makeText(LoginActivity.this, "Log in successful", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
@@ -144,5 +141,13 @@ public class LoginActivity extends AppCompatActivity {
     private void updateUser(FirebaseUser firebaseUser) {
         mUser = firebaseUser;
 
+        if (mUser != null) {
+            // Open User Profile after successful login
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            // To prevent user from returning back to Login Activity on pressing back button after logging in.
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish(); // to close Login Activity
+        }
     }
 }
