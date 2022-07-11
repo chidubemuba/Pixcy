@@ -2,6 +2,7 @@ package com.example.pixcy;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,35 +60,37 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         public void bind(Post post) {
             // Bind the post data to the view elements
-            long createdAt = post.getCreation_time_ms();
-            String timeAgo = Post.calculateTimeAgo(createdAt);
+
+            itemPostBinding.tvUsername.setText(post.getUser_name());
             itemPostBinding.tvDescription.setText(post.getDescription());
-            itemPostBinding.tvUsername.setText(post.getUser().getUsername());
-            itemPostBinding.tvRelativeTime.setText(timeAgo);
-            ParseFile image = post.getImage_url();
-            if (image != null) {
-                Glide.with(context).load(image.getUrl()).into(itemPostBinding.ivPost);
-            }
+            Glide.with(context).load(post.getImage_url()).into(itemPostBinding.ivPost);
+            //itemPostBinding.tvRelativeTime.setText(DateUtils.getRelativeTimeSpanString(post.getTimestamp()));
+//            long createdAt = post.getCreation_time_ms();
+//            String timeAgo = Post.calculateTimeAgo(createdAt);
+//            ParseFile image = post.getImage_url();
+//            if (image != null) {
+//                Glide.with(context).load(image.getUrl()).into(itemPostBinding.ivPost);
+//            }
 
         }
 
         @Override
         public void onClick(View v) {
-            //gets item position
-            Toast.makeText(itemView.getContext(), "This clicks",Toast.LENGTH_SHORT).show();
-            Log.i(TAG, "onClick: this works ");
-            int position = getAdapterPosition();
-            if(position != RecyclerView.NO_POSITION){
-                // get the movie at the position, this won't work if the class is static
-                Post post = posts.get(position);
-                // create intent for the new activity
-                Intent intent = new Intent(context, DetailActivity.class);
-                // serialize the movie using parceler, use its short name as a key
-                //intent.putExtra(Post.class.getSimpleName(), Parcels.wrap(post));
-                intent.putExtra("post", post);
-                // show the activity
-                context.startActivity(intent);
-            }
+//            //gets item position
+//            Toast.makeText(itemView.getContext(), "This clicks",Toast.LENGTH_SHORT).show();
+//            Log.i(TAG, "onClick: this works ");
+//            int position = getAdapterPosition();
+//            if(position != RecyclerView.NO_POSITION){
+//                // get the movie at the position, this won't work if the class is static
+//                Post post = posts.get(position);
+//                // create intent for the new activity
+//                Intent intent = new Intent(context, DetailActivity.class);
+//                // serialize the movie using parceler, use its short name as a key
+//                //intent.putExtra(Post.class.getSimpleName(), Parcels.wrap(post));
+//                intent.putExtra("post", post);
+//                // show the activity
+//                context.startActivity(intent);
+//            }
         }
     }
 
@@ -97,8 +100,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     }
 
     // Add a list of items -- change to type used
-    public void addAll(List<Post> posts) {
-        posts.addAll(posts);
+    public void addAll(List<Post> post) {
+        posts.addAll(post);
         notifyDataSetChanged();
     }
 }

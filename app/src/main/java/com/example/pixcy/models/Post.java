@@ -33,14 +33,14 @@ public class Post {
     public String getImage_url() {
         return image_url;
     }
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
+    }
     public Date getTimestamp() {
         return timestamp;
     }
-    public void  {
-        this.creation_time_ms = creation_time_ms;
-    }
-    public void setImage_url(String image_url) {
-        this.image_url = image_url;
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
     public String getUser_id() {
         return user_id;
@@ -48,6 +48,13 @@ public class Post {
     public void setUser_id(String user_id) {
         this.user_id = user_id;
     }
+    public String getUser_name() {
+        return user_name;
+    }
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
+    }
+
     public static String calculateTimeAgo(Date createdAt) {
 
         int SECOND_MILLIS = 1000;
