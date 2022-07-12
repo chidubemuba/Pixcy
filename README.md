@@ -26,16 +26,16 @@ This app allows the user to sign up or log into their account using Facebook. Us
 ### 1. User Features (Required and Optional)
 
 **Required Must-have Features**
-* [ ] User signs up or logs into their account using Facebook and Google firedb.
-* [ ] Create a database which holds multiple users records that can only be accessed using their Facebook username
+* [x] User signs up or logs into their account using Facebook or Google firedb.
+* [x] Create a database which holds multiple users records that can be accessed using their account username or email and password verification.
 * [ ] User can take pictures using their phone camera, add a caption/description, and post it on the app. These posts will be saved on the created database.
 * [ ] Newly taken pictures will be automatically inserted into the user own memories page without relying on a manual refresh.
-* [ ] User can pull down to refresh posts on their memories page
-* [ ] The current signed in user is persisted across app restarts
-* [ ] User can log out of their account.
-* [ ] Use the View Binding library to reduce view boilerplate.
+* [x] User can pull down to refresh posts on their memories page
+* [x] The current signed in user is persisted across app restarts
+* [x] User can log out of their account.
+* [x] Use the View Binding library to reduce view boilerplate.
 * [ ] User can tap a post to go to a Post Details activity, which includes timestamp and caption.
-* [ ] User should switch between different tabs using fragments and a Bottom Navigation View.
+* [x] User should switch between different tabs using fragments and a Bottom Navigation View.
 * [ ] User can view the location of each picture taken on a map
 * [ ] User can pinch to scale (zoom in/out) the location of each picture on the map
 
