@@ -39,10 +39,10 @@ public class User {
     public void setGender(String gender) {
         this.gender = gender;
     }
-    protected String getUsername() {
+    public String getUsername() {
         return username;
     }
-    protected void setUsername(String username) {
+    public void setUsername(String username) {
         this.username = username;
     }
 

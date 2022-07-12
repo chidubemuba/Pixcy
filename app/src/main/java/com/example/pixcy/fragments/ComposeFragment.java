@@ -26,6 +26,7 @@ import com.example.pixcy.PostsAdapter;
 import com.example.pixcy.R;
 import com.example.pixcy.databinding.FragmentComposeBinding;
 import com.example.pixcy.models.Post;
+import com.example.pixcy.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
@@ -46,6 +47,7 @@ import java.util.Date;
 public class ComposeFragment extends Fragment {
 
     public static final String TAG = "ComposeFragment";
+    private User user;
     private FragmentComposeBinding fragmentComposeBinding;
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     public String photoFileName = "photo.jpg";
@@ -53,6 +55,10 @@ public class ComposeFragment extends Fragment {
 
     public ComposeFragment() {
         // Required empty public constructor
+    }
+
+    public void ComposeFragment(User user) {
+        this.user = user;
     }
 
     // The onCreateView method is called when Fragment should create its View object hierarchy,

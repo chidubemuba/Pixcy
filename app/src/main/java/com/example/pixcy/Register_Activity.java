@@ -165,7 +165,7 @@ public class Register_Activity extends AppCompatActivity {
                     FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
 
                     // Enter User Data into the Firebase Firestore Database.
-                    User user = new User(textUsername, textEmail, textDOB, textGender);
+                    User user = new User(textDOB, textEmail, textGender, textUsername);
                     firestoredb.collection("users")
                             .document(firebaseUser.getUid())
                             .set(user)
@@ -181,7 +181,7 @@ public class Register_Activity extends AppCompatActivity {
                                     Intent intent = new Intent(Register_Activity.this, MainActivity.class);
                                     // To prevent user from returning back to Register Activity on pressing back button after registration.
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                                    intent.putExtra("username", user.getUsername);
+                                    intent.putExtra("username", user.getUsername());
                                     startActivity(intent);
                                     finish(); // to close Register Activity
                                 }

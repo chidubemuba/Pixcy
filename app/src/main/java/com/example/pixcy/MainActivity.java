@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -18,29 +19,37 @@ import com.example.pixcy.fragments.ComposeFragment;
 import com.example.pixcy.fragments.MapsFragment;
 import com.example.pixcy.fragments.MemoriesFragment;
 import com.example.pixcy.models.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
+    private List<User> userDetail = new ArrayList<>();
     private ActivityMainBinding activityMainBinding;
     final FragmentManager fragmentManager = getSupportFragmentManager();
+    public static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Set or remove the title
-//        getSupportActionBar().hide();
-
         activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = activityMainBinding.getRoot();
         setContentView(view);
 
-//        String username = getIntent().getStringExtra("username");
-        User username = Parcels.unwrap(getIntent().getParcelableExtra("username"));
+        queryUser();
 
         activityMainBinding.bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -87,5 +96,30 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void queryUser() {
+        // Access a Cloud Firestore instance from your Activity
+        FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
+
+        // Create a reference to the posts collection
+        CollectionReference usersCollectionReference = firestoredb.collection("users");
+        Query userQuery = usersCollectionReference
+                .whereEqualTo("email", FirebaseAuth.getInstance().getCurrentUser().getEmail());
+
+        userQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        User user = document.toObject(User.class);
+                        userDetail.add(user);
+                        Log.d(TAG, "on Complete: got a new post");
+                    }
+                } else {
+                    Log.d(TAG, "Query failed");
+                }
+            }
+        });
     }
 }

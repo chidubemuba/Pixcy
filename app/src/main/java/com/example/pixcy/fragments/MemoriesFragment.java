@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -73,9 +74,10 @@ public class MemoriesFragment extends Fragment {
         postList = new ArrayList<>();
         // Create the adapter
         adapter = new PostsAdapter(getContext(), postList);
+
         // Bind the adapter and layout manager to the RV
+        fragmentMemoriesBinding.rvPosts.setLayoutManager(new GridLayoutManager(getContext(), 3));
         fragmentMemoriesBinding.rvPosts.setAdapter(adapter);
-        fragmentMemoriesBinding.rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
         // query posts from Firestore
         queryPosts();
 
@@ -121,52 +123,13 @@ public class MemoriesFragment extends Fragment {
                         posts.add(post);
                         Log.d(TAG, "on Complete: got a new post");
                     }
-
                     postList.clear();
                     postList.addAll(posts);
                     adapter.notifyDataSetChanged();
-
                 } else {
                     Log.d(TAG, "Query failed");
                 }
             }
         });
-
-
-//        public void queryUser() {
-//            // Access a Cloud Firestore instance from your Activity
-//            FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
-//
-//            // Create a reference to the users collection
-////            CollectionReference usersCollectionReference = firestoredb.collection("users");
-//            firestoredb.collection("users")
-//                    .document()
-//                    .get()
-//                    .addOnSuccessListener()
-//        }
-
-
-        //        postsCollectionReference.limit(20);
-//        postsCollectionReference.orderBy("creation_time_ms", Query.Direction.DESCENDING);
-//        postsCollectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-//            @Override
-//            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-//                if (e != null || snapshots == null) {
-//                    Log.e(TAG, "Exception when querying posts", e);
-//                    return;
-//                }
-//
-//                postList = snapshots.toObjects(Post.class);
-//                System.out.println(" Hello " + postList);
-//
-//                for (Post post : postList) {
-////                    if (dc.getType() == DocumentChange.Type.ADDED) {
-////                        Log.d(TAG, "Post: " + post.getDocument().getData());
-////                    }
-//                    Log.d(TAG, "Post: " + post);
-//
-//                }
-//            }
-//        });
     }
 }

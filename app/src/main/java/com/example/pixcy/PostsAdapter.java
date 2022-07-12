@@ -60,23 +60,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         public void bind(Post post) {
             // Bind the post data to the view elements
-
-            itemPostBinding.tvUsername.setText(post.getUser_name());
             itemPostBinding.tvDescription.setText(post.getDescription());
             Glide.with(context).load(post.getImage_url()).into(itemPostBinding.ivPost);
-            //itemPostBinding.tvRelativeTime.setText(DateUtils.getRelativeTimeSpanString(post.getTimestamp()));
-//            long createdAt = post.getCreation_time_ms();
-//            String timeAgo = Post.calculateTimeAgo(createdAt);
-//            ParseFile image = post.getImage_url();
-//            if (image != null) {
-//                Glide.with(context).load(image.getUrl()).into(itemPostBinding.ivPost);
-//            }
-
         }
 
         @Override
         public void onClick(View v) {
 //            //gets item position
+//            itemPostBinding.tvUsername.setText(post.getUser_name());
 //            Toast.makeText(itemView.getContext(), "This clicks",Toast.LENGTH_SHORT).show();
 //            Log.i(TAG, "onClick: this works ");
 //            int position = getAdapterPosition();
