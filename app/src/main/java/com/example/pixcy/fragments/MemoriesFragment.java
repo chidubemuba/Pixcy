@@ -62,7 +62,6 @@ public class MemoriesFragment extends Fragment {
     public void onDestroyView(){
         super.onDestroyView();
         fragmentMemoriesBinding = null;
-
     }
 
     @Override
@@ -95,8 +94,6 @@ public class MemoriesFragment extends Fragment {
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-
-
     }
 
     private void fetchTimelineAsync(int i) {
@@ -135,6 +132,18 @@ public class MemoriesFragment extends Fragment {
             }
         });
 
+
+//        public void queryUser() {
+//            // Access a Cloud Firestore instance from your Activity
+//            FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
+//
+//            // Create a reference to the users collection
+////            CollectionReference usersCollectionReference = firestoredb.collection("users");
+//            firestoredb.collection("users")
+//                    .document()
+//                    .get()
+//                    .addOnSuccessListener()
+//        }
 
 
         //        postsCollectionReference.limit(20);

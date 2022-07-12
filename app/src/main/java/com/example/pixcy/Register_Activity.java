@@ -15,7 +15,10 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.example.pixcy.databinding.ActivityRegisterBinding;
+import com.example.pixcy.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,6 +29,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.parceler.Parcels;
 
 import java.util.Calendar;
 import java.util.Objects;
@@ -156,35 +162,40 @@ public class Register_Activity extends AppCompatActivity {
                     UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(textFullName).build();
                     firebaseUser.updateProfile(profileChangeRequest);
 
-                    // Enter User Data into the Firebase Realtime Database.
-                    ReadWriteUserDetails writeUserDetails = new ReadWriteUserDetails(textUsername, textDOB, textGender);
+                    FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
 
-                    //textUsername, description, created_at, image_url, location
+                    // Enter User Data into the Firebase Firestore Database.
+                    User user = new User(textUsername, textEmail, textDOB, textGender);
+                    firestoredb.collection("users")
+                            .document(firebaseUser.getUid())
+                            .set(user)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Log.d(TAG, "DocumentSnapshot successfully written!");
+                                    // Send Verification Email
+                                    firebaseUser.sendEmailVerification();
+                                    Toast.makeText(Register_Activity.this, "User registered successfully. Please verify your email", Toast.LENGTH_SHORT).show();
 
-                    // Extracting  User reference from Database for "Registered Users"
-                    DatabaseReference referenceProfile = FirebaseDatabase.getInstance().getReference("Registered Users");
+                                    // Open User Profile after successful registration
+                                    Intent intent = new Intent(Register_Activity.this, MainActivity.class);
+                                    // To prevent user from returning back to Register Activity on pressing back button after registration.
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                                    intent.putExtra("username", user.getUsername);
+                                    startActivity(intent);
+                                    finish(); // to close Register Activity
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(TAG, "Error writing document", e);
+                                    Toast.makeText(Register_Activity.this, "User registered failed. Please try again", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                    // Hide progressBar whether User creation is successful or not.
+                    activityRegisterBinding.pbRegister.setVisibility(View.GONE);
 
-                    referenceProfile.child(firebaseUser.getUid()).setValue(writeUserDetails).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                // Send Verification Email
-                                firebaseUser.sendEmailVerification();
-                                Toast.makeText(Register_Activity.this, "User registered successfully. Please verify your email", Toast.LENGTH_SHORT).show();
-
-                                // Open User Profile after successful registration
-                                Intent intent = new Intent(Register_Activity.this, MainActivity.class);
-                                // To prevent user from returning back to Register Activity on pressing back button after registration.
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                                finish(); // to close Register Activity
-                            } else {
-                                Toast.makeText(Register_Activity.this, "User registered failed. Please try again", Toast.LENGTH_SHORT).show();
-                            }
-                            // Hide progressBar whether User creation is successful or not.
-                            activityRegisterBinding.pbRegister.setVisibility(View.GONE);
-                        }
-                    });
                 } else {
                     try {
                         throw task.getException();

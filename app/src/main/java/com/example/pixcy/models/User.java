@@ -1,16 +1,20 @@
 package com.example.pixcy.models;
 
-public class User {
-    protected String username = "";
-    public String gender = "";
-    public String email = "";
-    public String dob = "";
+import org.parceler.Parcel;
 
+@Parcel
+public class User {
+    private String username = "";
+    private String gender = "";
+    private String email = "";
+    private String dob = "";
+
+    // empty constructor needed by the Parceler library
     public User() {
 
     }
 
-    protected User(String dob, String email, String gender, String username) {
+    public User(String dob, String email, String gender, String username) {
         this.dob = dob;
         this.email = email;
         this.gender = gender;

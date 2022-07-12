@@ -47,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            updateUser(currentUser);
+            login(currentUser);
         }
 
         // Show Hide password using Eye Icon
@@ -114,7 +114,7 @@ public class LoginActivity extends AppCompatActivity {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithEmail: success");
                     FirebaseUser user = mAuth.getCurrentUser();
-                    updateUser(user);
+                    login(user);
                     Toast.makeText(LoginActivity.this, "Log in successful", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
@@ -138,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void updateUser(FirebaseUser firebaseUser) {
+    private void login(FirebaseUser firebaseUser) {
         mUser = firebaseUser;
 
         if (mUser != null) {
@@ -146,6 +146,7 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             // To prevent user from returning back to Login Activity on pressing back button after logging in.
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+
             startActivity(intent);
             finish(); // to close Login Activity
         }

@@ -17,8 +17,11 @@ import com.example.pixcy.databinding.ActivityMainBinding;
 import com.example.pixcy.fragments.ComposeFragment;
 import com.example.pixcy.fragments.MapsFragment;
 import com.example.pixcy.fragments.MemoriesFragment;
+import com.example.pixcy.models.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+
+import org.parceler.Parcels;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
         activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = activityMainBinding.getRoot();
         setContentView(view);
+
+//        String username = getIntent().getStringExtra("username");
+        User username = Parcels.unwrap(getIntent().getParcelableExtra("username"));
 
         activityMainBinding.bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -74,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.action_logout) {
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            // To prevent user from returning back to Main Activity on pressing back button after logging out.
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
             return true;
