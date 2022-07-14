@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
+    private ItemPostBinding itemPostBinding;
     private Context context;
     private List<Post> posts;
     public static final String TAG = "PostsAdapter";
@@ -34,7 +35,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // For every visible item on the screen we want to inflate (create) a view
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        ItemPostBinding itemPostBinding = ItemPostBinding.inflate(layoutInflater, parent, false);
+        itemPostBinding = ItemPostBinding.inflate(layoutInflater, parent, false);
         return new ViewHolder(itemPostBinding);
     }
 

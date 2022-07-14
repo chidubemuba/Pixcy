@@ -29,7 +29,6 @@ import com.example.pixcy.models.Post;
 import com.example.pixcy.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -40,6 +39,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,7 +47,6 @@ import java.util.Date;
 public class ComposeFragment extends Fragment {
 
     public static final String TAG = "ComposeFragment";
-    private User user;
     private FragmentComposeBinding fragmentComposeBinding;
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     public String photoFileName = "photo.jpg";
@@ -55,10 +54,6 @@ public class ComposeFragment extends Fragment {
 
     public ComposeFragment() {
         // Required empty public constructor
-    }
-
-    public void ComposeFragment(User user) {
-        this.user = user;
     }
 
     // The onCreateView method is called when Fragment should create its View object hierarchy,
@@ -81,13 +76,6 @@ public class ComposeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        fragmentComposeBinding.btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
         fragmentComposeBinding.btnCaptureImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,11 +93,13 @@ public class ComposeFragment extends Fragment {
                     return;
                 }
                 if (photoFile == null || fragmentComposeBinding.ivPostImage.getDrawable() == null) {
-                    Toast.makeText(getContext(), "There's no image!",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "There's no image!", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
 //                ParseUser currentUser = ParseUser.getCurrentUser();
 //                savePost(description, currentUser, photoFile);
+//                createPost(description, String image_url);
             }
         });
     }
@@ -121,8 +111,8 @@ public class ComposeFragment extends Fragment {
         photoFile = getPhotoFileUri(photoFileName);
 
         // wrap File object into a content provider
-        Uri fileProvider = FileProvider.getUriForFile(getContext(), "com.codepath.fileprovider", photoFile);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
+//        Uri fileProvider = FileProvider.getUriForFile(getContext(), "com.codepath.fileprovider", photoFile);
+//        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
 
         // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
         // So as long as the result is not null, it's safe to use the intent.
@@ -156,32 +146,13 @@ public class ComposeFragment extends Fragment {
         File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
 
         // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
+        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
             Log.d(TAG, "failed to create directory");
         }
 
         // Return the file target for the photo based on filename
         return new File(mediaStorageDir.getPath() + File.separator + fileName);
     }
-//
-//    private void savePost(String description, ParseUser currentUser, File photoFile) {
-//        Post post = new Post();
-//        post.setDescription(description);
-//        post.setImage(new ParseFile(photoFile));
-//        //post.setUser(currentUser);
-//        post.saveInBackground(new SaveCallback() {
-//            @Override
-//            public void done(ParseException e) {
-//                if (e != null) {
-//                    Log.e(TAG, "Error while saving", e);
-//                    Toast.makeText(getContext(), "Error while saving!", Toast.LENGTH_SHORT).show();
-//                }
-//                Log.i(TAG, "Post save was successful!!");
-//                etDescription.setText("");
-//                ivPostImage.setImageResource(0);
-//            }
-//        });
-//    }
 
     public void createPost(String description, String image_url) {
 
@@ -207,4 +178,5 @@ public class ComposeFragment extends Fragment {
             }
         });
     }
+
 }
