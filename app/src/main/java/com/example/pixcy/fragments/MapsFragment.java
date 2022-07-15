@@ -124,11 +124,8 @@ public class MapsFragment extends Fragment {
                                 .snippet("this is a marker")
                                 .position(new LatLng(post.latitude, post.longitude))
                         );
-//                        posts.add(post);
                         Log.d(TAG, "on Complete: got a new post");
                     }
-//                    postList.clear();
-//                    postList.addAll(posts);
                 } else {
                     Log.d(TAG, "Query failed");
                 }

@@ -4,26 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp"
     tools:context=".fragments.MemoriesFragment">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cvProfile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="2dp"
-        app:cardCornerRadius="5dp"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/ivProfileBackground"
             android:layout_width="match_parent"
             android:layout_height="165dp"
-            android:layout_marginTop="2dp"
             android:adjustViewBounds="false"
             android:scaleType="centerCrop"
-            app:srcCompat="@drawable/background_image_5"
-            tools:layout_editor_absoluteX="3dp" />
+            app:srcCompat="@drawable/background_image_5" />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/ivProfilePicture"

@@ -50,6 +50,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,6 +62,7 @@ public class ComposeFragment extends Fragment {
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     public String photoFileName = "photo.jpg";
     File photoFile;
+    public String description;
     public double longitude;
     public double latitude;
     public String address;
@@ -114,7 +116,7 @@ public class ComposeFragment extends Fragment {
         // Create a storage reference from our app
         storageRef = storage.getReference();
         // Create a reference to 'images/mountains.jpg'
-        mountainImagesRef = storageRef.child("images/mountains.jpg");
+        mountainImagesRef = storageRef.child("images/" + UUID.randomUUID() + ".jpg");
 
         fragmentComposeBinding.btnCaptureImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,7 +128,7 @@ public class ComposeFragment extends Fragment {
         fragmentComposeBinding.btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String description = fragmentComposeBinding.etDescription.getText().toString();
+                description = fragmentComposeBinding.etDescription.getText().toString();
                 if (description.isEmpty()) {
                     Toast.makeText(getContext(), "Description can't be empty", Toast.LENGTH_SHORT).show();
                     return;
@@ -136,12 +138,7 @@ public class ComposeFragment extends Fragment {
                     return;
                 }
 
-
-                // Create a post object with the image url and all the required posts documents to the posts collection
-
-
-                //createPost(String address, String city, String country, String description, String image_url,
-               //double latitude, double longitude, String postalCode, String state, Date timestamp);
+                uploadPhoto();
             }
         });
     }
@@ -206,15 +203,6 @@ public class ComposeFragment extends Fragment {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
 
-//// Create file metadata including the content type
-//        StorageMetadata metadata = new StorageMetadata.Builder()
-//                .setContentType("image/jpg")
-//                .build();
-//
-//// Upload the file and metadata
-//        uploadTask = storageRef.child("images/mountains.jpg").putFile(file, metadata);
-
-
         UploadTask uploadTask = mountainImagesRef.putBytes(data);
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
@@ -236,6 +224,7 @@ public class ComposeFragment extends Fragment {
                             throw task.getException();
                         }
                         // Continue with the task to get the download URL
+                        Log.i(TAG, "result: " + mountainImagesRef.getDownloadUrl());
                         return mountainImagesRef.getDownloadUrl();
                     }
                 }).addOnCompleteListener(new OnCompleteListener<Uri>() {
@@ -243,9 +232,12 @@ public class ComposeFragment extends Fragment {
                     public void onComplete(@NonNull Task<Uri> task) {
                         if (task.isSuccessful()) {
                             Uri downloadUri = task.getResult();
+                            Log.i(TAG, "result check: " + downloadUri);
+                            // Create a post object with the image url and all the required posts documents to the posts collection
+                            createPost(address, city, country, description, downloadUri.toString(), latitude, longitude, postal_code, state);
                         } else {
                             // Handle failures
-                            // ...
+                            Log.e(TAG, "Failed to get Uri");
                         }
                     }
                 });
@@ -257,8 +249,9 @@ public class ComposeFragment extends Fragment {
 
 
 
+
     public void createPost(String address, String city, String country, String description, String image_url,
-                           double latitude, double longitude, String postal_code, String state, Date timestamp) {
+                           double latitude, double longitude, String postal_code, String state) {
 
         FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
 
@@ -272,16 +265,12 @@ public class ComposeFragment extends Fragment {
         post.setCity(city);
         post.setCountry(country);
         post.setDescription(description);
-        //post.setImage_url(image_url);
+        post.setImage_url(image_url);
         post.setLatitude(latitude);
         post.setLongitude(longitude);
         post.setPostal_code(postal_code);
         post.setState(state);
-
         post.setUser_id(user_id);
-
-
-
 
         newPostReference.set(post).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
