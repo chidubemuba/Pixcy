@@ -11,8 +11,9 @@
     <ImageView
         android:id="@+id/ivPostImage"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="300dp"
         android:layout_marginTop="4dp"
+        android:scaleType="fitCenter"
         tools:srcCompat="@tools:sample/avatars" />
 
     <EditText
@@ -23,7 +24,8 @@
         android:ems="10"
         android:gravity="start|top"
         android:hint="@string/description"
-        android:inputType="textMultiLine" />
+        android:inputType="textMultiLine"
+        android:minHeight="48dp" />
 
     <Button
         android:id="@+id/btnCaptureImage"

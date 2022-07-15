@@ -156,6 +156,7 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             // To prevent user from returning back to Login Activity on pressing back button after logging in.
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("userId", mUser.getUid());
             startActivity(intent);
             finish(); // to close Login Activity
         }

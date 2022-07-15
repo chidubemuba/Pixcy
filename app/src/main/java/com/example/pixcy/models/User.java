@@ -4,10 +4,10 @@ import org.parceler.Parcel;
 
 @Parcel
 public class User {
-    private String username = "";
-    private String gender = "";
-    private String email = "";
-    private String dob = "";
+    private String username;
+    private String gender;
+    private String email;
+    private String dob;
 
     // empty constructor needed by the Parceler library
     public User() {
@@ -44,6 +44,11 @@ public class User {
     }
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @Override
+    public String toString() {
+        return "{ " + this.username + "}";
     }
 
 }

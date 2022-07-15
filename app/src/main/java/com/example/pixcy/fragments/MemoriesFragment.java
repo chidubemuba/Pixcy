@@ -19,11 +19,14 @@ import com.example.pixcy.PostsAdapter;
 import com.example.pixcy.R;
 import com.example.pixcy.databinding.FragmentMemoriesBinding;
 import com.example.pixcy.models.Post;
+import com.example.pixcy.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -42,9 +45,10 @@ public class MemoriesFragment extends Fragment {
     private FragmentMemoriesBinding fragmentMemoriesBinding;
     private SwipeRefreshLayout swipeRefreshLayout;
     public static final String TAG = "MemoriesFragment";
-    public List<Post> postList;
-    public List<Post> posts = new ArrayList<>();
+    private List<Post> postList;
+    private List<Post> posts = new ArrayList<>();
     private PostsAdapter adapter;
+    public String userId;
 
     public MemoriesFragment() {
         // Required empty public constructor
@@ -68,6 +72,9 @@ public class MemoriesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        Bundle userDetails = getArguments();
+        userId = userDetails.getString("userId");
 
         // Create the layout file which represents one post
         // Create data source
@@ -96,6 +103,9 @@ public class MemoriesFragment extends Fragment {
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
+
+        // Get User's details
+        queryUser();
     }
 
     private void fetchTimelineAsync(int i) {
@@ -105,7 +115,7 @@ public class MemoriesFragment extends Fragment {
         fragmentMemoriesBinding.swipeContainer.setRefreshing(false);
     }
 
-    public void queryPosts() {
+    private void queryPosts() {
         // Access a Cloud Firestore instance from your Activity
         FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
 
@@ -114,12 +124,15 @@ public class MemoriesFragment extends Fragment {
         Query postQuery = postsCollectionReference
                 .whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
 
+
         postQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
+                        Log.d("QUERY", "res " + document.getData().get("description"));
                         Post post = document.toObject(Post.class);
+                        Log.d("QUERY", "res post " + post);
                         posts.add(post);
                         Log.d(TAG, "on Complete: got a new post");
                     }
@@ -132,4 +145,31 @@ public class MemoriesFragment extends Fragment {
             }
         });
     }
+
+    public void queryUser() {
+        // Access a Cloud Firestore instance from your Activity
+        FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
+
+        // Create a reference to the users document
+        DocumentReference docRef = firestoredb.collection("users").document(userId);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        User user = document.toObject(User.class);
+                        fragmentMemoriesBinding.tvUsername.setText(user.getUsername());
+                        Log.d(TAG, "User data: " + user);
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
 }

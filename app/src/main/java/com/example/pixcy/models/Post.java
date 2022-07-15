@@ -7,23 +7,54 @@ import com.google.firebase.firestore.ServerTimestamp;
 import java.util.Date;
 
 public class Post {
-    private String description = "";
-    private String image_url = "";
+    private String description;
+    private String image_url;
     private @ServerTimestamp Date timestamp;
-    private String user_id = "";
-    private String user_name = "";
+    private String user_id;
+    public double longitude;
+    public double latitude;
+    public String address;
+    public String city;
+    public String state;
+    public String postal_code;
+    public String country;
 
     public Post() {
     }
 
-    public Post(String description, String image_url, Date timestamp, String user_id, String user_name) {
+    public Post(String address, String city, String country, String description, String image_url,
+                double latitude, double longitude, String postal_code, String state, Date timestamp, String user_id) {
+        this.address = address;
+        this.city = city;
+        this.country = country;
         this.description = description;
         this.image_url = image_url;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.postal_code = postal_code;
+        this.state = state;
         this.timestamp = timestamp;
         this.user_id = user_id;
-        this.user_name = user_name;
     }
 
+    public String getAddress() {
+        return address;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
+    public String getCity() {
+        return city;
+    }
+    public void setCity(String city) {
+        this.city = city;
+    }
+    public String getCountry() {
+        return country;
+    }
+    public void setCountry(String country) {
+        this.country = country;
+    }
     public String getDescription() {
         return description;
     }
@@ -35,6 +66,30 @@ public class Post {
     }
     public void setImage_url(String image_url) {
         this.image_url = image_url;
+    }
+    public double getLatitude() {
+        return latitude;
+    }
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+    public double getLongitude() {
+        return longitude;
+    }
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+    public String getPostal_code() {
+        return postal_code;
+    }
+    public void setPostal_code(String postalCode) {
+        this.postal_code = postalCode;
+    }
+    public String getState() {
+        return state;
+    }
+    public void setState(String state) {
+        this.state = state;
     }
     public Date getTimestamp() {
         return timestamp;
@@ -48,12 +103,7 @@ public class Post {
     public void setUser_id(String user_id) {
         this.user_id = user_id;
     }
-    public String getUser_name() {
-        return user_name;
-    }
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
-    }
+
 
     public static String calculateTimeAgo(Date createdAt) {
 
@@ -89,6 +139,11 @@ public class Post {
         }
 
         return "";
+    }
+
+    @Override
+    public String toString() {
+        return "[ " + ", description: " + this.description + "]";
     }
 
 }

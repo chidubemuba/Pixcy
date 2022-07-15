@@ -2,36 +2,36 @@ package com.example.pixcy.fragments;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.example.pixcy.PermissionUtils;
 import com.example.pixcy.R;
-import com.google.android.gms.maps.CameraUpdateFactory;
+import com.example.pixcy.models.Post;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsFragment extends Fragment {
-//        implements
-//        GoogleMap.OnMyLocationButtonClickListener,
-//        GoogleMap.OnMyLocationClickListener,
-//        ActivityCompat.OnRequestPermissionsResultCallback {
 
     /**
      * Request code for location permission request.
@@ -42,8 +42,12 @@ public class MapsFragment extends Fragment {
      * Flag indicating whether a requested permission has been denied after returning in {@link
      * #onRequestPermissionsResult(int, String[], int[])}.
      */
+    private static final String TAG = "MapsFragment";
     private boolean permissionDenied = false;
     private GoogleMap map;
+    private List<Post> postList;
+    private List<Post> posts = new ArrayList<>();
+
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -63,8 +67,10 @@ public class MapsFragment extends Fragment {
 //            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
 //            map = googleMap;
+            queryPosts(googleMap);
 //            map.setOnMyLocationButtonClickListener(this);
 //            map.setOnMyLocationClickListener(this);
+//            map.setMyLocationEnabled(true);
 //            enableMyLocation();
         }
     };
@@ -87,6 +93,7 @@ public class MapsFragment extends Fragment {
             mapFragment.getMapAsync(callback);
         }
 
+
 //        // Initialize the SDK
 //        Places.initialize(getApplicationContext(), apiKey);
 //
@@ -95,75 +102,37 @@ public class MapsFragment extends Fragment {
 
     }
 
-//    /**
-//     * Enables the My Location layer if the fine location permission has been granted.
-//     */
-//    @SuppressLint("MissingPermission")
-//    private void enableMyLocation() {
-//        // 1. Check if permissions are granted, if so, enable the my location layer
-//        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-//                == PackageManager.PERMISSION_GRANTED
-//                || ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-//                == PackageManager.PERMISSION_GRANTED) {
-//            map.setMyLocationEnabled(true);
-//            return;
-//        }
-//
-//        // 2. Otherwise, request location permissions from the user.
-//        PermissionUtils.requestLocationPermissions(this, LOCATION_PERMISSION_REQUEST_CODE, true);
-//    }
+    private void queryPosts(GoogleMap map) {
+        // Access a Cloud Firestore instance from your Activity
+        FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
 
-//    @Override
-//    public boolean onMyLocationButtonClick() {
-//        Toast.makeText(getContext(), "MyLocation button clicked", Toast.LENGTH_SHORT).show();
-//        // Return false so that we don't consume the event and the default behavior still occurs
-//        // (the camera animates to the user's current position).
-//        return false;
-//    }
-//
+        // Create a reference to the posts collection
+        CollectionReference postsCollectionReference = firestoredb.collection("posts");
+        Query postQuery = postsCollectionReference
+                .whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-//    @Override
-//    public void onMyLocationClick(@NonNull Location location) {
-//        Toast.makeText(getContext(), "Current location:\n" + location, Toast.LENGTH_LONG).show();
-//    }
-//
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-//                                           @NonNull int[] grantResults) {
-//        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
-//            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//            return;
-//        }
-//
-//        if (PermissionUtils.isPermissionGranted(permissions, grantResults,
-//                Manifest.permission.ACCESS_FINE_LOCATION) || PermissionUtils
-//                .isPermissionGranted(permissions, grantResults,
-//                        Manifest.permission.ACCESS_COARSE_LOCATION)) {
-//            // Enable the my location layer if the permission has been granted.
-//            enableMyLocation();
-//        } else {
-//            // Permission was denied. Display an error message
-//            // Display the missing permission error dialog when the fragments resume.
-//            permissionDenied = true;
-//        }
-//    }
-//
-//    @Override
-//    protected void onResumeFragments() {
-//        super.onResumeFragments();
-//        if (permissionDenied) {
-//            // Permission was not granted, display error dialog.
-//            showMissingPermissionError();
-//            permissionDenied = false;
-//        }
-//    }
-//
-//    /**
-//     * Displays a dialog with error message explaining that the location permission is missing.
-//     */
-//    private void showMissingPermissionError() {
-//        PermissionUtils.PermissionDeniedDialog
-//                .newInstance(true).show(getSupportFragmentManager(), "dialog");
-//    }
-
+        postQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Log.d("QUERY", "res " + document.getData().get("description"));
+                        Post post = document.toObject(Post.class);
+                        Log.d("QUERY", "res post " + post);
+                        map.addMarker(new MarkerOptions()
+                                .title("Example")
+                                .snippet("this is a marker")
+                                .position(new LatLng(post.latitude, post.longitude))
+                        );
+//                        posts.add(post);
+                        Log.d(TAG, "on Complete: got a new post");
+                    }
+//                    postList.clear();
+//                    postList.addAll(posts);
+                } else {
+                    Log.d(TAG, "Query failed");
+                }
+            }
+        });
+    }
 }

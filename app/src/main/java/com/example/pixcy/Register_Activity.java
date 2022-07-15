@@ -181,7 +181,8 @@ public class Register_Activity extends AppCompatActivity {
                                     Intent intent = new Intent(Register_Activity.this, MainActivity.class);
                                     // To prevent user from returning back to Register Activity on pressing back button after registration.
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    intent.putExtra("username", user.getUsername());
+                                    intent.putExtra("userId", firebaseUser.getUid());
+//                                    intent.putExtra("username", user.getUsername());
                                     startActivity(intent);
                                     finish(); // to close Register Activity
                                 }

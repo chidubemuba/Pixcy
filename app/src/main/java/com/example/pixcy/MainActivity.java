@@ -35,6 +35,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -48,31 +50,29 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
-    private List<User> userDetail = new ArrayList<>();
     private ActivityMainBinding activityMainBinding;
     final FragmentManager fragmentManager = getSupportFragmentManager();
     public static final String TAG = "MainActivity";
     protected LocationManager locationManager;
+    public String userId;
     public double longitude;
     public double latitude;
     public String address;
     public String city;
     public String state;
-    public String postalCode;
+    public String postal_code;
     public String country;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Intent intent = getIntent();
+        userId = intent.getStringExtra("userId");
+
         activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = activityMainBinding.getRoot();
         setContentView(view);
-
-        // Get User's details
-        queryUser();
 
         // Runtime permissions
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -88,14 +88,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 Fragment fragment;
+                Bundle location_data = new Bundle();
+                location_data.putDouble("latitude", latitude);
+                location_data.putDouble("longitude", longitude);
+                location_data.putString("address", address);
+                location_data.putString("city", city);
+                location_data.putString("state", state);
+                location_data.putString("postal_code", postal_code);
+                location_data.putString("country", country);
+                Bundle userDetails = new Bundle();
+                userDetails.putString("userId", userId);
                 switch (menuItem.getItemId()) {
                     case R.id.action_compose:
                         Toast.makeText(MainActivity.this, "Compose", Toast.LENGTH_SHORT).show();
                         fragment = new ComposeFragment();
+                        fragment.setArguments(location_data);
                         break;
                     case R.id.action_memories:
                         Toast.makeText(MainActivity.this, "Memories", Toast.LENGTH_SHORT).show();
                         fragment = new MemoriesFragment();
+                        fragment.setArguments(userDetails);
                         break;
                     case R.id.action_map:
                     default:
@@ -131,37 +143,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return super.onOptionsItemSelected(item);
     }
 
-    public void queryUser() {
-        // Access a Cloud Firestore instance from your Activity
-        FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
-
-        // Create a reference to the posts collection
-        CollectionReference usersCollectionReference = firestoredb.collection("users");
-        Query userQuery = usersCollectionReference
-                .whereEqualTo("email", FirebaseAuth.getInstance().getCurrentUser().getEmail());
-
-        userQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        User user = document.toObject(User.class);
-                        userDetail.add(user);
-                        Log.d(TAG, "on Complete: got a new post");
-                    }
-                } else {
-                    Log.d(TAG, "Query failed");
-                }
-            }
-        });
-    }
-
     @SuppressLint("MissingPermission")
     private void getLocation() {
-
         try {
             locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 0, this);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 1, this);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -169,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
-//        Toast.makeText(this, "Latitude: "+latitude+", Longitude: "+longitude, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Latitude: "+latitude+", Longitude: "+longitude, Toast.LENGTH_SHORT).show();
         try {
             longitude = location.getLongitude();
             latitude = location.getLatitude();
@@ -181,14 +167,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
                 city = addresses.get(0).getLocality();
                 state = addresses.get(0).getAdminArea();
-                postalCode = addresses.get(0).getPostalCode();
+                postal_code = addresses.get(0).getPostalCode();
                 country = addresses.get(0).getCountryName();
 
                 Log.i(TAG,"Address: " + address);
                 Log.i(TAG,"AddressCity: " + city);
                 Log.i(TAG,"AddressState: "+ state);
                 Log.i(TAG,"AddressCountry: "+ country);
-                Log.i(TAG,"AddressPostal: "+ postalCode);
+                Log.i(TAG,"AddressPostal: "+ postal_code);
                 Log.i(TAG,"AddressLatitude: " + latitude);
                 Log.i(TAG,"AddressLongitude: " + longitude);
             }

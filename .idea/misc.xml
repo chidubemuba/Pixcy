@@ -7,6 +7,7 @@
         <entry key="app/src/main/res/drawable/border2.xml" value="0.2625" />
         <entry key="app/src/main/res/drawable/custom_item_layout.xml" value="0.124" />
         <entry key="app/src/main/res/drawable/ic_baseline_logout_24.xml" value="0.128" />
+        <entry key="app/src/main/res/drawable/ic_baseline_map_24.xml" value="0.14" />
         <entry key="app/src/main/res/drawable/user_name.xml" value="0.3105" />
         <entry key="app/src/main/res/layout/activity_detail.xml" value="0.16111111111111112" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.2821557971014493" />
@@ -18,6 +19,7 @@
         <entry key="app/src/main/res/layout/item_post.xml" value="0.40260416666666665" />
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.4036458333333333" />
         <entry key="app/src/main/res/menu/menu_logout.xml" value="0.40260416666666665" />
+        <entry key="app/src/main/res/xml/provider_paths.xml" value="0.19630192502532928" />
       </map>
     </option>
   </component>
