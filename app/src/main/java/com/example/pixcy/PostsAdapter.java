@@ -16,6 +16,8 @@ import com.bumptech.glide.Glide;
 import com.example.pixcy.databinding.ItemPostBinding;
 import com.example.pixcy.models.Post;
 
+import org.parceler.Parcels;
+
 import java.util.Date;
 import java.util.List;
 
@@ -67,22 +69,20 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         @Override
         public void onClick(View v) {
-//            //gets item position
-//            itemPostBinding.tvUsername.setText(post.getUser_name());
-//            Toast.makeText(itemView.getContext(), "This clicks",Toast.LENGTH_SHORT).show();
-//            Log.i(TAG, "onClick: this works ");
-//            int position = getAdapterPosition();
-//            if(position != RecyclerView.NO_POSITION){
-//                // get the movie at the position, this won't work if the class is static
-//                Post post = posts.get(position);
-//                // create intent for the new activity
-//                Intent intent = new Intent(context, DetailActivity.class);
-//                // serialize the movie using parceler, use its short name as a key
-//                //intent.putExtra(Post.class.getSimpleName(), Parcels.wrap(post));
-//                intent.putExtra("post", post);
-//                // show the activity
-//                context.startActivity(intent);
-//            }
+            //gets item position
+            Toast.makeText(itemView.getContext(), "This clicks",Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "onClick: this works ");
+            int position = getAdapterPosition();
+            if(position != RecyclerView.NO_POSITION){
+                Post post = posts.get(position);
+                // create intent for the new activity
+                Intent intent = new Intent(context, DetailActivity.class);
+                // serialize the post using parceler, using post as the key
+                intent.putExtra("post", Parcels.wrap(post));
+//                intent.putExtra(Post.class.getSimpleName(), Parcels.wrap(post));
+                // show the activity
+                context.startActivity(intent);
+            }
         }
     }
 

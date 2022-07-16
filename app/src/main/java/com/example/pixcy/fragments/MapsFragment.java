@@ -1,14 +1,24 @@
 package com.example.pixcy.fragments;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.example.pixcy.R;
 import com.example.pixcy.models.Post;
@@ -16,6 +26,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -47,6 +58,7 @@ public class MapsFragment extends Fragment {
     private GoogleMap map;
     private List<Post> postList;
     private List<Post> posts = new ArrayList<>();
+    private String image_url;
 
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
@@ -62,16 +74,7 @@ public class MapsFragment extends Fragment {
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
-//            LatLng sydney = new LatLng(-34, 151);
-//            googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
-//            map = googleMap;
             queryPosts(googleMap);
-//            map.setOnMyLocationButtonClickListener(this);
-//            map.setOnMyLocationClickListener(this);
-//            map.setMyLocationEnabled(true);
-//            enableMyLocation();
         }
     };
 
@@ -92,14 +95,6 @@ public class MapsFragment extends Fragment {
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
         }
-
-
-//        // Initialize the SDK
-//        Places.initialize(getApplicationContext(), apiKey);
-//
-//        // Create a new PlacesClient instance
-//        PlacesClient placesClient = Places.createClient(this);
-
     }
 
     private void queryPosts(GoogleMap map) {
@@ -132,4 +127,5 @@ public class MapsFragment extends Fragment {
             }
         });
     }
+
 }

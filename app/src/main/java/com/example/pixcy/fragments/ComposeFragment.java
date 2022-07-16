@@ -63,6 +63,7 @@ public class ComposeFragment extends Fragment {
     public String photoFileName = "photo.jpg";
     File photoFile;
     public String description;
+    private String image_url;
     public double longitude;
     public double latitude;
     public String address;
@@ -137,7 +138,6 @@ public class ComposeFragment extends Fragment {
                     Toast.makeText(getContext(), "There's no image!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 uploadPhoto();
             }
         });
@@ -176,7 +176,6 @@ public class ComposeFragment extends Fragment {
                 Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
             }
         }
-
     }
 
     // Returns the File for a photo stored on disk given the fileName
@@ -188,7 +187,6 @@ public class ComposeFragment extends Fragment {
         if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
             Log.d(TAG, "failed to create directory");
         }
-
         // Return the file target for the photo based on filename
         return new File(mediaStorageDir.getPath() + File.separator + fileName);
     }
@@ -232,27 +230,23 @@ public class ComposeFragment extends Fragment {
                     public void onComplete(@NonNull Task<Uri> task) {
                         if (task.isSuccessful()) {
                             Uri downloadUri = task.getResult();
+                            image_url = downloadUri.toString();
                             Log.i(TAG, "result check: " + downloadUri);
                             // Create a post object with the image url and all the required posts documents to the posts collection
-                            createPost(address, city, country, description, downloadUri.toString(), latitude, longitude, postal_code, state);
+                            createPost(address, city, country, description, image_url, latitude, longitude, postal_code, state);
                         } else {
                             // Handle failures
                             Log.e(TAG, "Failed to get Uri");
                         }
                     }
                 });
-
-
             }
         });
+        Log.i(TAG, "download_url: " + image_url);
     }
-
-
-
 
     public void createPost(String address, String city, String country, String description, String image_url,
                            double latitude, double longitude, String postal_code, String state) {
-
         FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
 
         // Create a reference to the posts collection where we will be inserting the data
@@ -283,5 +277,4 @@ public class ComposeFragment extends Fragment {
             }
         });
     }
-
 }

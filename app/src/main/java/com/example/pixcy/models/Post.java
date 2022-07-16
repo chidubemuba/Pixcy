@@ -4,8 +4,11 @@ import android.util.Log;
 
 import com.google.firebase.firestore.ServerTimestamp;
 
+import org.parceler.Parcel;
+
 import java.util.Date;
 
+@Parcel
 public class Post {
     private String description;
     private String image_url;
@@ -143,7 +146,11 @@ public class Post {
 
     @Override
     public String toString() {
-        return "[ " + ", description: " + this.description + "]";
+        return "Post {" + "address: " + this.address + '\'' + "city: " + this.city  + '\'' + "country: "
+                + this.country + '\'' + "description :" + this.description + '\'' + "image_url :"
+                + this.image_url + '\'' + "latitude :" + this.latitude + '\'' + "longitude :"
+                + this.longitude + '\'' + "postal_code :" + this.postal_code + '\'' + "state :"
+                + this.state + '\'' + "timestamp :" + this.timestamp + '\'' + "user_id :" + this.user_id + '}';
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.pixcy.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.pixcy.DetailActivity;
 import com.example.pixcy.PostsAdapter;
 import com.example.pixcy.R;
 import com.example.pixcy.databinding.FragmentMemoriesBinding;
@@ -33,6 +35,8 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,7 +128,6 @@ public class MemoriesFragment extends Fragment {
         Query postQuery = postsCollectionReference
                 .whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-
         postQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -161,6 +164,8 @@ public class MemoriesFragment extends Fragment {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         User user = document.toObject(User.class);
                         fragmentMemoriesBinding.tvUsername.setText(user.getUsername());
+                        Intent intent = new Intent(getContext(), DetailActivity.class);
+                        intent.putExtra("user", Parcels.wrap(user));
                         Log.d(TAG, "User data: " + user);
                     } else {
                         Log.d(TAG, "No such document");
