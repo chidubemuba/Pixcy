@@ -113,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     default:
                         Toast.makeText(MainActivity.this, "Map", Toast.LENGTH_SHORT).show();
                         fragment = new MapsFragment();
+                        fragment.setArguments(location_data);
                         break;
                 }
                 fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();

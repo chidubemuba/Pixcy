@@ -163,6 +163,8 @@ public class MemoriesFragment extends Fragment {
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         User user = document.toObject(User.class);
+                        Log.d(TAG, "DocumentSnapshot data USER: " + user);
+                        Log.d(TAG, "DocumentSnapshot data binding : " + fragmentMemoriesBinding.tvUsername);
                         fragmentMemoriesBinding.tvUsername.setText(user.getUsername());
                         Intent intent = new Intent(getContext(), DetailActivity.class);
                         intent.putExtra("user", Parcels.wrap(user));
