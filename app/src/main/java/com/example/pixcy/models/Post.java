@@ -19,7 +19,7 @@ public class Post {
     public String address;
     public String city;
     public String state;
-    public String postal_code;
+    public String postalCode;
     public String country;
 
     public Post() {
@@ -34,7 +34,7 @@ public class Post {
         this.image_url = image_url;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.postal_code = postal_code;
+        this.postalCode = postalCode;
         this.state = state;
         this.timestamp = timestamp;
         this.user_id = user_id;
@@ -82,11 +82,11 @@ public class Post {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
-    public String getPostal_code() {
-        return postal_code;
+    public String getPostalCode() {
+        return postalCode;
     }
-    public void setPostal_code(String postalCode) {
-        this.postal_code = postalCode;
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
     }
     public String getState() {
         return state;
@@ -149,7 +149,7 @@ public class Post {
         return "Post {" + "address: " + this.address + '\'' + "city: " + this.city  + '\'' + "country: "
                 + this.country + '\'' + "description :" + this.description + '\'' + "image_url :"
                 + this.image_url + '\'' + "latitude :" + this.latitude + '\'' + "longitude :"
-                + this.longitude + '\'' + "postal_code :" + this.postal_code + '\'' + "state :"
+                + this.longitude + '\'' + "postal_code :" + this.postalCode + '\'' + "state :"
                 + this.state + '\'' + "timestamp :" + this.timestamp + '\'' + "user_id :" + this.user_id + '}';
     }
 

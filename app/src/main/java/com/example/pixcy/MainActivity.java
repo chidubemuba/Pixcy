@@ -29,6 +29,7 @@ import com.example.pixcy.databinding.ActivityMainBinding;
 import com.example.pixcy.fragments.ComposeFragment;
 import com.example.pixcy.fragments.MapsFragment;
 import com.example.pixcy.fragments.MemoriesFragment;
+import com.example.pixcy.models.Post;
 import com.example.pixcy.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -47,6 +48,8 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
@@ -55,13 +58,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public static final String TAG = "MainActivity";
     protected LocationManager locationManager;
     public String userId;
+    public User user;
+//    public List<Post> mPosts;
     public double longitude;
     public double latitude;
     public String address;
     public String city;
     public String state;
-    public String postal_code;
+    public String postalCode;
     public String country;
+
+    private interface GetUserCallback {
+        void done(User user, Exception e);
+    }
+
+    private interface GetPostsCallback {
+        void done(List<Post> posts, Exception e);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,59 +82,112 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         Intent intent = getIntent();
         userId = intent.getStringExtra("userId");
+        user = Parcels.unwrap(intent.getParcelableExtra("user"));
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
 
         activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = activityMainBinding.getRoot();
         setContentView(view);
 
-        // Runtime permissions
+        // Location runtime permissions
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] {
+            ActivityCompat.requestPermissions(this, new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION
             }, 100);
         }
 
-        // Get User's current location
-        getLocation();
+        MemoriesFragment memoriesFragment = MemoriesFragment.newInstance(user, new ArrayList<>());
+        fragmentManager.beginTransaction().replace(R.id.flContainer, memoriesFragment).commit();
 
-        activityMainBinding.bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+        // Set default selection - empty
+        activityMainBinding.bottomNavigation.setSelectedItemId(R.id.action_memories);
+
+        executorService.submit(new Runnable() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                Fragment fragment;
-                Bundle location_data = new Bundle();
-                location_data.putDouble("latitude", latitude);
-                location_data.putDouble("longitude", longitude);
-                location_data.putString("address", address);
-                location_data.putString("city", city);
-                location_data.putString("state", state);
-                location_data.putString("postal_code", postal_code);
-                location_data.putString("country", country);
-                Bundle userDetails = new Bundle();
-                userDetails.putString("userId", userId);
-                switch (menuItem.getItemId()) {
-                    case R.id.action_compose:
-                        Toast.makeText(MainActivity.this, "Compose", Toast.LENGTH_SHORT).show();
-                        fragment = new ComposeFragment();
-                        fragment.setArguments(location_data);
-                        break;
-                    case R.id.action_memories:
-                        Toast.makeText(MainActivity.this, "Memories", Toast.LENGTH_SHORT).show();
-                        fragment = new MemoriesFragment();
-                        fragment.setArguments(userDetails);
-                        break;
-                    case R.id.action_map:
-                    default:
-                        Toast.makeText(MainActivity.this, "Map", Toast.LENGTH_SHORT).show();
-                        fragment = new MapsFragment();
-                        fragment.setArguments(location_data);
-                        break;
-                }
-                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
-                return true;
+            public void run() {
+//                // get user
+//                getUser(new GetUserCallback() {
+//                    @Override
+//                    public void done(User user, Exception e) {
+//                        if (e == null) {
+//                            mUser = user;
+//                        }
+//                    }
+//                });
+
+                // get location
+                getLocation();
+
+                // get posts
+                queryPosts(new GetPostsCallback() {
+                    @Override
+                    public void done(List<Post> posts, Exception e) {
+                        if (e == null){
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    activityMainBinding.bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+                                        @Override
+                                        public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                                            Fragment fragment;
+//                                            Bundle location_data = new Bundle();
+                                            LocationData locationData = new LocationData();
+                                            locationData.setLatitude(latitude);
+                                            locationData.setPostalCode(postalCode);
+                                            locationData.setLongitude(longitude);
+                                            locationData.setAddress(address);
+                                            locationData.setState(state);
+                                            locationData.setCity(city);
+                                            locationData.setCountry(country);
+
+//                                    location_data.putDouble("latitude", latitude);
+//                                    location_data.putDouble("longitude", longitude);
+//                                    location_data.putString("address", address);
+//                                    location_data.putString("city", city);
+//                                    location_data.putString("state", state);
+//                                    location_data.putString("postal_code", postal_code);
+//                                    location_data.putString("country", country);
+//                Bundle userDetails = new Bundle();
+//                userDetails.putString("userId", userId);
+                                            switch (menuItem.getItemId()) {
+                                                case R.id.action_compose:
+                                                    Toast.makeText(MainActivity.this, "Compose", Toast.LENGTH_SHORT).show();
+//                                                    fragment = new ComposeFragment();
+//                                                    fragment.setArguments(location_data);
+                                                    fragment = ComposeFragment.newInstance(locationData, userId);
+                                                    break;
+                                                case R.id.action_memories:
+                                                    Toast.makeText(MainActivity.this, "Memories", Toast.LENGTH_SHORT).show();
+                                                    fragment = MemoriesFragment.newInstance(user, posts);
+//                        fragment.setArguments(userDetails);
+                                                    break;
+                                                case R.id.action_map:
+                                                default:
+                                                    Toast.makeText(MainActivity.this, "Map", Toast.LENGTH_SHORT).show();
+                                                    fragment = MapsFragment.newInstance(locationData, posts);
+//                                            fragment.setArguments(location_data);
+                                                    break;
+                                            }
+                                            fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+
+                                            return true;
+                                        }
+                                    });
+                                    // default when posts are fetched
+                                    fragmentManager.beginTransaction().replace(R.id.flContainer, MemoriesFragment.newInstance(user, posts)).commit();
+                                }
+                            });
+                        } else {
+                            Toast.makeText(MainActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                            Log.e(TAG, "error getting user posts", e);
+                        }
+
+                    }
+                });
+
+
             }
         });
-        // Set default selection
-        activityMainBinding.bottomNavigation.setSelectedItemId(R.id.action_memories);
     }
 
     @Override
@@ -156,7 +222,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
-        //Toast.makeText(this, "Latitude: "+latitude+", Longitude: "+longitude, Toast.LENGTH_SHORT).show();
         try {
             longitude = location.getLongitude();
             latitude = location.getLatitude();
@@ -168,20 +233,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
                 city = addresses.get(0).getLocality();
                 state = addresses.get(0).getAdminArea();
-                postal_code = addresses.get(0).getPostalCode();
+                postalCode = addresses.get(0).getPostalCode();
                 country = addresses.get(0).getCountryName();
 
-                Log.i(TAG,"Address: " + address);
-                Log.i(TAG,"AddressCity: " + city);
-                Log.i(TAG,"AddressState: "+ state);
-                Log.i(TAG,"AddressCountry: "+ country);
-                Log.i(TAG,"AddressPostal: "+ postal_code);
-                Log.i(TAG,"AddressLatitude: " + latitude);
-                Log.i(TAG,"AddressLongitude: " + longitude);
+                Log.i(TAG, "Address: " + address);
+                Log.i(TAG, "AddressCity: " + city);
+                Log.i(TAG, "AddressState: " + state);
+                Log.i(TAG, "AddressCountry: " + country);
+                Log.i(TAG, "AddressPostal: " + postalCode);
+                Log.i(TAG, "AddressLatitude: " + latitude);
+                Log.i(TAG, "AddressLongitude: " + longitude);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Toast.makeText(this, "Latitude: "+latitude+", Longitude: "+longitude, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -207,5 +273,48 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onProviderDisabled(@NonNull String provider) {
         LocationListener.super.onProviderDisabled(provider);
+    }
+    
+
+    public void reload() {
+        queryPosts(new GetPostsCallback() {
+            @Override
+            public void done(List<Post> posts, Exception e) {
+
+            }
+        });
+    }
+
+    private void queryPosts(GetPostsCallback callback) {
+        // Access a Cloud Firestore instance from your Activity
+        FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
+
+        // Create a reference to the posts collection
+        CollectionReference postsCollectionReference = firestoredb.collection("posts");
+        Query postQuery = postsCollectionReference
+                .whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+        ArrayList<Post> posts = new ArrayList<>();
+        postQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Log.d("QUERY", "res " + document.getData().get("description"));
+                        Post post = document.toObject(Post.class);
+                        Log.d("QUERY", "res post " + post);
+                        posts.add(post);
+                        Log.d(TAG, "on Complete: got a new post");
+                    }
+                    callback.done(posts, null);
+//                    postList.clear();
+//                    postList.addAll(posts);
+//                    adapter.notifyDataSetChanged();
+                } else {
+                    Log.d(TAG, "Query failed");
+                    callback.done(null, task.getException());
+                }
+            }
+        });
     }
 }

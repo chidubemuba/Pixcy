@@ -25,10 +25,14 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,61 +62,60 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
             login(currentUser);
+        } else {
+            // Show Hide password using Eye Icon
+            activityLoginBinding.ivShowHidePassword.setImageResource(R.drawable.ic_baseline_visibility_off_24);
+            activityLoginBinding.ivShowHidePassword.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (activityLoginBinding.etLoginPassword.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())) {
+                        // If password is visible then hide it
+                        activityLoginBinding.etLoginPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                        // Change icon
+                        activityLoginBinding.ivShowHidePassword.setImageResource(R.drawable.ic_baseline_visibility_off_24);
+                    } else {
+                        activityLoginBinding.etLoginPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                        activityLoginBinding.ivShowHidePassword.setImageResource(R.drawable.ic_baseline_visibility_24);
+                    }
+                }
+            });
+
+            // Login User
+            activityLoginBinding.btnLogin.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activityLoginBinding.btnLogin.setEnabled(false);
+                    String textEmail = activityLoginBinding.etLoginEmail.getText().toString();
+                    String textPassword = activityLoginBinding.etLoginPassword.getText().toString();
+
+                    if (TextUtils.isEmpty(textEmail)) {
+                        Toast.makeText(LoginActivity.this, "Please enter your email", Toast.LENGTH_SHORT).show();
+                        activityLoginBinding.etLoginEmail.setError("Email is required");
+                        activityLoginBinding.etLoginEmail.requestFocus();
+                    } else if (!Patterns.EMAIL_ADDRESS.matcher(textEmail).matches()) {
+                        Toast.makeText(LoginActivity.this, "Please re-enter your email", Toast.LENGTH_SHORT).show();
+                        activityLoginBinding.etLoginEmail.setError("Valid email is required");
+                        activityLoginBinding.etLoginEmail.requestFocus();
+                    } else if (TextUtils.isEmpty(textPassword)) {
+                        Toast.makeText(LoginActivity.this, "Please enter your password", Toast.LENGTH_SHORT).show();
+                        activityLoginBinding.etLoginPassword.setError("Password is required");
+                        activityLoginBinding.etLoginPassword.requestFocus();
+                    } else {
+                        activityLoginBinding.pbLogin.setVisibility(View.VISIBLE);
+                        loginUser(textEmail, textPassword);
+                    }
+                }
+            });
+
+            // Register User
+            activityLoginBinding.btnRegister.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(LoginActivity.this, Register_Activity.class);
+                    startActivity(intent);
+                }
+            });
         }
-
-        // Show Hide password using Eye Icon
-        activityLoginBinding.ivShowHidePassword.setImageResource(R.drawable.ic_baseline_visibility_off_24);
-        activityLoginBinding.ivShowHidePassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (activityLoginBinding.etLoginPassword.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())) {
-                    // If password is visible then hide it
-                    activityLoginBinding.etLoginPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                    // Change icon
-                    activityLoginBinding.ivShowHidePassword.setImageResource(R.drawable.ic_baseline_visibility_off_24);
-                } else {
-                    activityLoginBinding.etLoginPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                    activityLoginBinding.ivShowHidePassword.setImageResource(R.drawable.ic_baseline_visibility_24);
-                }
-            }
-        });
-
-        // Login User
-        activityLoginBinding.btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activityLoginBinding.btnLogin.setEnabled(false);
-                String textEmail = activityLoginBinding.etLoginEmail.getText().toString();
-                String textPassword = activityLoginBinding.etLoginPassword.getText().toString();
-
-                if (TextUtils.isEmpty(textEmail)) {
-                    Toast.makeText(LoginActivity.this, "Please enter your email", Toast.LENGTH_SHORT).show();
-                    activityLoginBinding.etLoginEmail.setError("Email is required");
-                    activityLoginBinding.etLoginEmail.requestFocus();
-                } else if (!Patterns.EMAIL_ADDRESS.matcher(textEmail).matches()) {
-                    Toast.makeText(LoginActivity.this, "Please re-enter your email", Toast.LENGTH_SHORT).show();
-                    activityLoginBinding.etLoginEmail.setError("Valid email is required");
-                    activityLoginBinding.etLoginEmail.requestFocus();
-                } else if (TextUtils.isEmpty(textPassword)) {
-                    Toast.makeText(LoginActivity.this, "Please enter your password", Toast.LENGTH_SHORT).show();
-                    activityLoginBinding.etLoginPassword.setError("Password is required");
-                    activityLoginBinding.etLoginPassword.requestFocus();
-                } else {
-                    activityLoginBinding.pbLogin.setVisibility(View.VISIBLE);
-                    loginUser(textEmail, textPassword);
-                }
-            }
-        });
-
-
-        // Register User
-        activityLoginBinding.btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, Register_Activity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     private void loginUser(String email, String password) {
@@ -151,14 +154,39 @@ public class LoginActivity extends AppCompatActivity {
     private void login(FirebaseUser firebaseUser) {
         mUser = firebaseUser;
 
-        if (mUser != null) {
-            // Open User Profile after successful login
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            // To prevent user from returning back to Login Activity on pressing back button after logging in.
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("userId", mUser.getUid());
-            startActivity(intent);
-            finish(); // to close Login Activity
-        }
+        FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
+
+        // Create a reference to the users document
+        DocumentReference docRef = firestoredb.collection("users").document(mUser.getUid());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+//                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        User user = document.toObject(User.class);
+                        // Open User Profile after successful login
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        // To prevent user from returning back to Login Activity on pressing back button after logging in.
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.putExtra("userId", mUser.getUid());
+                        intent.putExtra("user", Parcels.wrap(user));
+                        startActivity(intent);
+                        finish(); // to close Login Activity
+//                        Log.d(TAG, "DocumentSnapshot data USER: " + user);
+//                        Log.d(TAG, "DocumentSnapshot data binding : " + fragmentMemoriesBinding.tvUsername);
+//                        fragmentMemoriesBinding.tvUsername.setText(user.getUsername());
+//                        Intent intent = new Intent(getContext(), DetailActivity.class);
+//                        intent.putExtra("user", Parcels.wrap(user));
+//                        Log.d(TAG, "User data: " + user);
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 }

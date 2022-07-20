@@ -15,6 +15,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import android.os.Environment;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.pixcy.BuildConfig;
+import com.example.pixcy.LocationData;
 import com.example.pixcy.MainActivity;
 import com.example.pixcy.PostsAdapter;
 import com.example.pixcy.R;
@@ -45,8 +47,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.parceler.Parcels;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -62,6 +67,7 @@ public class ComposeFragment extends Fragment {
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     public String photoFileName = "photo.jpg";
     File photoFile;
+    public String userId;
     public String description;
     private String image_url;
     public double longitude;
@@ -69,8 +75,11 @@ public class ComposeFragment extends Fragment {
     public String address;
     public String city;
     public String state;
-    public String postal_code;
+    public String postalCode;
     public String country;
+    private LocationData locationData;
+    public static final String ARG_PARAM1 = "param1";
+    public static final String ARG_PARAM2 = "param2";
 
     // Declare variables for firebase storage and StorageReference
     FirebaseStorage storage;
@@ -97,20 +106,38 @@ public class ComposeFragment extends Fragment {
         fragmentComposeBinding = null;
     }
 
+    public static ComposeFragment newInstance(LocationData locationData, String userId) {
+        ComposeFragment composeFragment = new ComposeFragment();
+        Bundle args = new Bundle();
+
+        args.putString(ARG_PARAM1, userId);
+        args.putParcelable(ARG_PARAM2, Parcels.wrap(locationData));
+        composeFragment.setArguments(args);
+        return composeFragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null){
+            locationData = Parcels.unwrap(getArguments().getParcelable(ARG_PARAM2));
+            userId = getArguments().getString(ARG_PARAM1);
+        }
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         Bundle location_data = getArguments();
-        if (location_data != null) {
-            latitude = location_data.getDouble("latitude");
-            longitude = location_data.getDouble("longitude");
-            address = location_data.getString("address");
-            city = location_data.getString("city");
-            state = location_data.getString("state");
-            postal_code = location_data.getString("postal_code");
-            country = location_data.getString("country");
-        }
+//        assert location_data != null;
+        latitude = location_data.getDouble("latitude");
+        longitude = location_data.getDouble("longitude");
+        address = location_data.getString("address");
+        city = location_data.getString("city");
+        state = location_data.getString("state");
+        postalCode = location_data.getString("postalCode");
+        country = location_data.getString("country");
 
         // Create an instance of FirebaseStorage
         storage = FirebaseStorage.getInstance();
@@ -233,7 +260,7 @@ public class ComposeFragment extends Fragment {
                             image_url = downloadUri.toString();
                             Log.i(TAG, "result check: " + downloadUri);
                             // Create a post object with the image url and all the required posts documents to the posts collection
-                            createPost(address, city, country, description, image_url, latitude, longitude, postal_code, state);
+                            createPost(address, city, country, description, image_url, latitude, longitude, postalCode, state, userId);
                         } else {
                             // Handle failures
                             Log.e(TAG, "Failed to get Uri");
@@ -246,13 +273,13 @@ public class ComposeFragment extends Fragment {
     }
 
     public void createPost(String address, String city, String country, String description, String image_url,
-                           double latitude, double longitude, String postal_code, String state) {
+                           double latitude, double longitude, String postalCode, String state, String userId) {
         FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
 
         // Create a reference to the posts collection where we will be inserting the data
         DocumentReference newPostReference = firestoredb.collection("posts").document();
 
-        String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//        String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
         // Date timestamp
         Post post = new Post();
         post.setAddress(address);
@@ -262,9 +289,9 @@ public class ComposeFragment extends Fragment {
         post.setImage_url(image_url);
         post.setLatitude(latitude);
         post.setLongitude(longitude);
-        post.setPostal_code(postal_code);
+        post.setPostalCode(postalCode);
         post.setState(state);
-        post.setUser_id(user_id);
+        post.setUser_id(userId);
 
         newPostReference.set(post).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

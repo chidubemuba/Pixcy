@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +41,8 @@ import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -49,10 +52,11 @@ public class MemoriesFragment extends Fragment {
     private FragmentMemoriesBinding fragmentMemoriesBinding;
     private SwipeRefreshLayout swipeRefreshLayout;
     public static final String TAG = "MemoriesFragment";
-    private List<Post> postList;
-    private List<Post> posts = new ArrayList<>();
+    private List<Post> posts;
     private PostsAdapter adapter;
-    public String userId;
+    public User user;
+    public static final String ARG_PARAM1 = "param1";
+    public static final String ARG_PARAM2 = "param2";
 
     public MemoriesFragment() {
         // Required empty public constructor
@@ -73,24 +77,52 @@ public class MemoriesFragment extends Fragment {
         fragmentMemoriesBinding = null;
     }
 
+    public static MemoriesFragment newInstance(User user, List<Post> posts) {
+        MemoriesFragment memoriesFragment = new MemoriesFragment();
+        Bundle args = new Bundle();
+        ArrayList<Parcelable> parcelableArrayList = new ArrayList<>();
+        for(Post post: posts){
+            parcelableArrayList.add(Parcels.wrap(post));
+        }
+        args.putParcelableArrayList(ARG_PARAM1, parcelableArrayList);
+        args.putParcelable(ARG_PARAM2, Parcels.wrap(user));
+        memoriesFragment.setArguments(args);
+        return memoriesFragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null){
+            user = Parcels.unwrap(getArguments().getParcelable(ARG_PARAM2));
+            ArrayList<Parcelable> parcelableArrayList = getArguments().getParcelableArrayList(ARG_PARAM1);
+            posts = new ArrayList<>();
+            for(Parcelable item: parcelableArrayList){
+                posts.add(Parcels.unwrap(item));
+            }
+        }
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Bundle userDetails = getArguments();
-        userId = userDetails.getString("userId");
-
-        // Create the layout file which represents one post
-        // Create data source
-        postList = new ArrayList<>();
         // Create the adapter
-        adapter = new PostsAdapter(getContext(), postList);
+        adapter = new PostsAdapter(getContext(), posts);
 
         // Bind the adapter and layout manager to the RV
         fragmentMemoriesBinding.rvPosts.setLayoutManager(new GridLayoutManager(getContext(), 3));
         fragmentMemoriesBinding.rvPosts.setAdapter(adapter);
+        fragmentMemoriesBinding.tvUsername.setText(user.getUsername());
+
         // query posts from Firestore
-        queryPosts();
+//        ExecutorService executorService  = Executors.newSingleThreadExecutor();
+//        executorService.submit(new Runnable() {
+//            @Override
+//            public void run() {
+//                queryPosts();
+//            }
+//        });
 
         // Lookup the swipe container view
         swipeRefreshLayout = view.findViewById(R.id.swipeContainer);
@@ -108,75 +140,22 @@ public class MemoriesFragment extends Fragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        // Get User's details
-        queryUser();
+//        // Get User's details
+//        executorService.submit(new Runnable() {
+//            @Override
+//            public void run() {
+//                queryUser();
+//            }
+//        });
     }
 
     private void fetchTimelineAsync(int i) {
         adapter.clear();
         posts.clear();
-        queryPosts();
+//        queryPosts();
+        // todo: create a method in parent activity to fetch posts and use a callback to pass the posts to this fragment
         fragmentMemoriesBinding.swipeContainer.setRefreshing(false);
     }
 
-    private void queryPosts() {
-        // Access a Cloud Firestore instance from your Activity
-        FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
-
-        // Create a reference to the posts collection
-        CollectionReference postsCollectionReference = firestoredb.collection("posts");
-        Query postQuery = postsCollectionReference
-                .whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
-
-        postQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Log.d("QUERY", "res " + document.getData().get("description"));
-                        Post post = document.toObject(Post.class);
-                        Log.d("QUERY", "res post " + post);
-                        posts.add(post);
-                        Log.d(TAG, "on Complete: got a new post");
-                    }
-                    postList.clear();
-                    postList.addAll(posts);
-                    adapter.notifyDataSetChanged();
-                } else {
-                    Log.d(TAG, "Query failed");
-                }
-            }
-        });
-    }
-
-    public void queryUser() {
-        // Access a Cloud Firestore instance from your Activity
-        FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
-
-        // Create a reference to the users document
-        DocumentReference docRef = firestoredb.collection("users").document(userId);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        User user = document.toObject(User.class);
-                        Log.d(TAG, "DocumentSnapshot data USER: " + user);
-                        Log.d(TAG, "DocumentSnapshot data binding : " + fragmentMemoriesBinding.tvUsername);
-                        fragmentMemoriesBinding.tvUsername.setText(user.getUsername());
-                        Intent intent = new Intent(getContext(), DetailActivity.class);
-                        intent.putExtra("user", Parcels.wrap(user));
-                        Log.d(TAG, "User data: " + user);
-                    } else {
-                        Log.d(TAG, "No such document");
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
-            }
-        });
-    }
 
 }
