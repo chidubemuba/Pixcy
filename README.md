@@ -28,24 +28,25 @@ This app allows the user to sign up or log into their account using Facebook. Us
 **Required Must-have Features**
 * [x] User signs up or logs into their account using Facebook or Google firedb.
 * [x] Create a database which holds multiple users records that can be accessed using their account username or email and password verification.
-* [ ] User can take pictures using their phone camera, add a caption/description, and post it on the app. These posts will be saved on the created database.
-* [ ] Newly taken pictures will be automatically inserted into the user own memories page without relying on a manual refresh.
+* [x] User can take pictures using their phone camera, add a caption/description, and post it on the app. These posts will be saved on the created database.
 * [x] User can pull down to refresh posts on their memories page
 * [x] The current signed in user is persisted across app restarts
 * [x] User can log out of their account.
 * [x] Use the View Binding library to reduce view boilerplate.
-* [ ] User can tap a post to go to a Post Details activity, which includes timestamp and caption.
+* [x] User can tap a post to go to a Post Details activity, which includes timestamp and caption.
 * [x] User should switch between different tabs using fragments and a Bottom Navigation View.
-* [ ] User can view the location of each picture taken on a map
-* [ ] User can pinch to scale (zoom in/out) the location of each picture on the map
+* [x] User can view the location of each picture taken on a map
+* [x] User can pinch to scale (zoom in/out) the location of each picture on the map
+* [x] User will have various view experiences as they pinch to scale the location of the pictures on maps
 
 **Optional Nice-to-have features**
+* [x] Improve the runtime speed of my application as a complex feature.
+* [ ] Newly taken pictures will be automatically inserted into the user own memories page without relying on a manual refresh.
 * [ ] Improve user interface by experimenting with styling and coloring as well as applying rounded corners for the image post using glide transformation
 * [ ] Allow user to make, upload videos, and view videos on their feed.
 * [ ] User can load more posts once they reach the bottom of the feed using endless scrolling.
 * [ ] Allow the logged in user to add a profile photo
 * [ ] Display the user's post in a cardview layout
-* [ ] User will have various view experiences as they pich to scale the location of the pictures on maps
 
 ### 2. Screen Archetypes
 
