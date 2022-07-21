@@ -92,6 +92,10 @@ public class MapsFragment extends Fragment {
     }
 
     private ZoomLevel zoomLevel = ZoomLevel.COUNTRY;
+<<<<<<< Updated upstream
+=======
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
+>>>>>>> Stashed changes
 
     public static MapsFragment newInstance(LocationData locationData, List<Post> posts) {
         MapsFragment fragment = new MapsFragment();
@@ -131,9 +135,14 @@ public class MapsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+<<<<<<< Updated upstream
         Bundle location_data = getArguments();
         latitude = location_data.getDouble("latitude");
         longitude = location_data.getDouble("longitude");
+=======
+        latitude = locationData.getLatitude();
+        longitude = locationData.getLongitude();
+>>>>>>> Stashed changes
 
         //handle exception thrown by getBitMapFromLink
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -154,29 +163,20 @@ public class MapsFragment extends Fragment {
                         public void onCameraIdle() {
 
                             ZoomLevel currentZoomLevel = getZoomLevel(googleMap.getCameraPosition().zoom);
-                            System.out.println("camera zoom level: " + currentZoomLevel.toString());
+                            System.out.println("camera zoom level: " + currentZoomLevel.toString() + "ZOOM: "+googleMap.getCameraPosition().zoom);
+                            // if zoom has entered another level - state, city, country, replace markers
                             if (currentZoomLevel != zoomLevel){
                                 zoomLevel = currentZoomLevel;
                                 addMarkers();
                             }
-                            // if zoom has entered another level - state, city, country, replace markers
-                            // we
                         }
                     });
-
-
-//                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
-//                    googleMap.addMarker(new MarkerOptions()
-//                            .position(userLocation)
-//                            .title("me")
-//                    );
                 }
             });
         }
-
-
     }
 
+<<<<<<< Updated upstream
 //    private void queryPosts(GoogleMap map) {
 //        // Access a Cloud Firestore instance from your Activity
 //        FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
@@ -210,6 +210,9 @@ public class MapsFragment extends Fragment {
 //    }
 
     private void addMarkers() {
+=======
+    private void addMarkers(GoogleMap map) {
+>>>>>>> Stashed changes
         Log.d(TAG, "addMarks ran ");
         ArrayList<Post> filteredPosts = new ArrayList<>();
         switch (zoomLevel){
@@ -244,6 +247,7 @@ public class MapsFragment extends Fragment {
                 // do city
                 break;
         }
+<<<<<<< Updated upstream
 
         map.clear();
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -266,10 +270,38 @@ public class MapsFragment extends Fragment {
     }
 
 
+=======
+        map.clear();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("filtered posts length: " + filteredPosts.size());
+                for(Post filteredPost: filteredPosts){
+                    System.out.println("filtered post: " + filteredPost);
+                    getMarkerBitmapFromView(filteredPost, new GetMarkerBitmapFromViewCallback() {
+                        @Override
+                        public void done(Bitmap bitmap, Exception e) {
+                            if (e == null){
+                                System.out.println("Add marker is working");
+                                map.addMarker(new MarkerOptions().position(new LatLng(filteredPost.getLatitude(), filteredPost.getLongitude()))
+                                        .snippet(filteredPost.getDescription())
+                                        .title("this is a post").icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                            } else {
+                                Log.e(TAG, "error in getMarkerBitmapFromView", e);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+>>>>>>> Stashed changes
     /***
      * Code Aopted from StackOverflow: https://stackoverflow.com/questions/22139515/set-marker-icon-on-google-maps-v2-android-from-url
      *
      */
+<<<<<<< Updated upstream
     public Bitmap getBitMapFromLink(String remotePath) {
         try {
             URL url = new URL(remotePath);
@@ -287,6 +319,24 @@ public class MapsFragment extends Fragment {
             e.printStackTrace();
             return null;
         }
+=======
+
+    private interface GetBitmapFromLinkCallback {
+        void done(Bitmap bitmap, Exception exception);
+    }
+
+    public Bitmap getBitMapFromLink(String remotePath) throws IOException {
+        URL url = new URL(remotePath);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        try {
+            connection.connect();
+        } catch (Exception e) {
+            Log.v("MAP-FRAGMENT", e.toString());
+        }
+        InputStream input = connection.getInputStream();
+        Bitmap imageBitmap = BitmapFactory.decodeStream(input);
+        return imageBitmap;
+>>>>>>> Stashed changes
     }
 
     /**
@@ -315,16 +365,56 @@ public class MapsFragment extends Fragment {
         return returnedBitmap;
     }
 
+<<<<<<< Updated upstream
+=======
+    private void getMarkerBitmapFromView(Post post, GetMarkerBitmapFromViewCallback callback) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Bitmap image = getBitMapFromLink(post.getImage_url());
+
+                    mCustomMarkerView = requireActivity().getLayoutInflater().inflate(R.layout.view_custom_marker, null);
+                    //TextView markerSnippet = (TextView)  mCustomMarkerView.findViewById(R.id.markerSnippet);
+                    ImageView markerImageView = (ImageView) mCustomMarkerView.findViewById(R.id.profile_image);
+
+                    requireActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            markerImageView.setImageBitmap(image);
+
+                            mCustomMarkerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                            mCustomMarkerView.layout(0, 0, mCustomMarkerView.getMeasuredWidth(), mCustomMarkerView.getMeasuredHeight());
+                            mCustomMarkerView.buildDrawingCache();
+                            Bitmap returnedBitmap = Bitmap.createBitmap(mCustomMarkerView.getMeasuredWidth(), mCustomMarkerView.getMeasuredHeight(),
+                                    Bitmap.Config.ARGB_8888);
+                            Canvas canvas = new Canvas(returnedBitmap);
+                            canvas.drawColor(Color.WHITE, PorterDuff.Mode.SRC_IN);
+                            Drawable drawable = mCustomMarkerView.getBackground();
+                            if (drawable != null)
+                                drawable.draw(canvas);
+                            mCustomMarkerView.draw(canvas);
+                            callback.done(returnedBitmap, null);
+                        }
+                    });
+                } catch (Exception e){
+                    callback.done(null, e);
+                }
+            }
+        });
+    }
+
+>>>>>>> Stashed changes
     private ZoomLevel getZoomLevel(double zoomLevel) {
-        if (zoomLevel >= 3 && zoomLevel <= 6) {
+        if (zoomLevel >= 1 && zoomLevel < 4) {
             return ZoomLevel.COUNTRY;
 
-        } else if (zoomLevel >= 7 && zoomLevel <= 10) {
+        } else if (zoomLevel >= 4 && zoomLevel <= 7) {
             return ZoomLevel.STATE;
 
         } else {
             return ZoomLevel.CITY;
         }
     }
-
 }

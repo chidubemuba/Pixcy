@@ -1,34 +1,33 @@
 {
   "project_info": {
-    "project_number": "930307855557",
-    "firebase_url": "https://pixcy-13848-default-rtdb.firebaseio.com",
-    "project_id": "pixcy-13848",
-    "storage_bucket": "pixcy-13848.appspot.com"
+    "project_number": "3559934789",
+    "project_id": "pixcy-45d24",
+    "storage_bucket": "pixcy-45d24.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:930307855557:android:884c90e5c684a1474dccac",
+        "mobilesdk_app_id": "1:3559934789:android:156dbe0d73d64ca7a14c2c",
         "android_client_info": {
           "package_name": "com.example.pixcy"
         }
       },
       "oauth_client": [
         {
-          "client_id": "930307855557-1lfd98jalja7r4shf7qt2lggiq40rpuj.apps.googleusercontent.com",
+          "client_id": "3559934789-uove8fksourkfhupus12abuttpn2e5hn.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDIC_nX5244O60PEZohisWcIorZ1FLaYW4"
+          "current_key": "AIzaSyBMSXIsm1dOdFaVBpK6zS6CcVOs80E61lA"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "930307855557-1lfd98jalja7r4shf7qt2lggiq40rpuj.apps.googleusercontent.com",
+              "client_id": "3559934789-uove8fksourkfhupus12abuttpn2e5hn.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
