@@ -130,7 +130,6 @@ public class ComposeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         Bundle location_data = getArguments();
-//        assert location_data != null;
         latitude = location_data.getDouble("latitude");
         longitude = location_data.getDouble("longitude");
         address = location_data.getString("address");
@@ -279,7 +278,6 @@ public class ComposeFragment extends Fragment {
         // Create a reference to the posts collection where we will be inserting the data
         DocumentReference newPostReference = firestoredb.collection("posts").document();
 
-//        String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
         // Date timestamp
         Post post = new Post();
         post.setAddress(address);

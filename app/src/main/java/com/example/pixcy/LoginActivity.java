@@ -155,7 +155,6 @@ public class LoginActivity extends AppCompatActivity {
         mUser = firebaseUser;
 
         FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
-
         // Create a reference to the users document
         DocumentReference docRef = firestoredb.collection("users").document(mUser.getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -164,7 +163,6 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-//                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         User user = document.toObject(User.class);
                         // Open User Profile after successful login
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -174,12 +172,6 @@ public class LoginActivity extends AppCompatActivity {
                         intent.putExtra("user", Parcels.wrap(user));
                         startActivity(intent);
                         finish(); // to close Login Activity
-//                        Log.d(TAG, "DocumentSnapshot data USER: " + user);
-//                        Log.d(TAG, "DocumentSnapshot data binding : " + fragmentMemoriesBinding.tvUsername);
-//                        fragmentMemoriesBinding.tvUsername.setText(user.getUsername());
-//                        Intent intent = new Intent(getContext(), DetailActivity.class);
-//                        intent.putExtra("user", Parcels.wrap(user));
-//                        Log.d(TAG, "User data: " + user);
                     } else {
                         Log.d(TAG, "No such document");
                     }

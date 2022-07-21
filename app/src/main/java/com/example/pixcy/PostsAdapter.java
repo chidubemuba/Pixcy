@@ -79,7 +79,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 Intent intent = new Intent(context, DetailActivity.class);
                 // serialize the post using parceler, using post as the key
                 intent.putExtra("post", Parcels.wrap(post));
-//                intent.putExtra(Post.class.getSimpleName(), Parcels.wrap(post));
                 // show the activity
                 context.startActivity(intent);
             }

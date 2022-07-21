@@ -37,15 +37,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.api.Places;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+
 
 import org.parceler.Parcels;
 
@@ -276,7 +268,6 @@ public class MapsFragment extends Fragment {
                         @Override
                         public void run() {
                             markerImageView.setImageBitmap(image);
-
                             mCustomMarkerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
                             mCustomMarkerView.layout(0, 0, mCustomMarkerView.getMeasuredWidth(), mCustomMarkerView.getMeasuredHeight());
                             mCustomMarkerView.buildDrawingCache();
@@ -301,10 +292,8 @@ public class MapsFragment extends Fragment {
     private ZoomLevel getZoomLevel(double zoomLevel) {
         if (zoomLevel >= 1 && zoomLevel < 4) {
             return ZoomLevel.COUNTRY;
-
         } else if (zoomLevel >= 4 && zoomLevel <= 7) {
             return ZoomLevel.STATE;
-
         } else {
             return ZoomLevel.CITY;
         }

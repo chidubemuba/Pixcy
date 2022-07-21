@@ -23,26 +23,12 @@ import com.example.pixcy.R;
 import com.example.pixcy.databinding.FragmentMemoriesBinding;
 import com.example.pixcy.models.Post;
 import com.example.pixcy.models.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+
 
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -115,15 +101,6 @@ public class MemoriesFragment extends Fragment {
         fragmentMemoriesBinding.rvPosts.setAdapter(adapter);
         fragmentMemoriesBinding.tvUsername.setText(user.getUsername());
 
-        // query posts from Firestore
-//        ExecutorService executorService  = Executors.newSingleThreadExecutor();
-//        executorService.submit(new Runnable() {
-//            @Override
-//            public void run() {
-//                queryPosts();
-//            }
-//        });
-
         // Lookup the swipe container view
         swipeRefreshLayout = view.findViewById(R.id.swipeContainer);
 
@@ -139,20 +116,11 @@ public class MemoriesFragment extends Fragment {
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-
-//        // Get User's details
-//        executorService.submit(new Runnable() {
-//            @Override
-//            public void run() {
-//                queryUser();
-//            }
-//        });
     }
 
     private void fetchTimelineAsync(int i) {
         adapter.clear();
         posts.clear();
-//        queryPosts();
         // todo: create a method in parent activity to fetch posts and use a callback to pass the posts to this fragment
         fragmentMemoriesBinding.swipeContainer.setRefreshing(false);
     }
