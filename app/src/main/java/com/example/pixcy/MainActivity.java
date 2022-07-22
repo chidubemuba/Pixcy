@@ -166,6 +166,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         // Access a Cloud Firestore instance from your Activity
         FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
 
+
+
         // Create a reference to the posts collection
         CollectionReference postsCollectionReference = firestoredb.collection("posts");
         Query postQuery = postsCollectionReference
