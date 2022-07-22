@@ -1,6 +1,7 @@
 package com.example.pixcy;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -41,7 +42,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -92,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         Intent intent = getIntent();
         userId = intent.getStringExtra("userId");
         user = Parcels.unwrap(intent.getParcelableExtra("user"));
-        System.out.println("user information: "+user.getUsername() + ", " + user.getEmail() + "," + user.getDob());
+        System.out.println("user information: " + user.getUsername() + ", " + user.getEmail() + "," + user.getDob());
         ExecutorService executorService = Executors.newSingleThreadExecutor();
 
         activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -165,33 +168,30 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void queryPosts(GetPostsCallback callback) {
         // Access a Cloud Firestore instance from your Activity
         FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
+        firestoredb.collection("posts")
+                .whereEqualTo("user_id", userId)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null || value == null) {
+                            Log.w(TAG, "Listen failed.", e);
+                            callback.done(null, e);
+                            return;
+                        }
 
-
-
-        // Create a reference to the posts collection
-        CollectionReference postsCollectionReference = firestoredb.collection("posts");
-        Query postQuery = postsCollectionReference
-                .whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
-
-        ArrayList<Post> posts = new ArrayList<>();
-        postQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Log.d("QUERY", "res " + document.getData().get("description"));
-                        Post post = document.toObject(Post.class);
-                        Log.d("QUERY", "res post " + post);
-                        posts.add(post);
-                        Log.d(TAG, "on Complete: got a new post");
+                        ArrayList<Post> posts = new ArrayList<>();
+                        for (DocumentSnapshot documentSnapshot : value.getDocuments()) {
+                            Log.d("QUERY", "res " + documentSnapshot.getData().get("description"));
+                            Post post = documentSnapshot.toObject(Post.class);
+                            Log.d("QUERY", "res post " + post);
+                            posts.add(post);
+                            Log.d(TAG, "on Complete: got a new post");
+                        }
+                        Log.d(TAG, "Current cites in CA: " + posts);
+                        callback.done(posts, null);
                     }
-                    callback.done(posts, null);
-                } else {
-                    Log.d(TAG, "Query failed");
-                    callback.done(null, task.getException());
-                }
-            }
-        });
+                });
     }
 
     @Override

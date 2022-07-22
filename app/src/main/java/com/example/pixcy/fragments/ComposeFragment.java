@@ -132,14 +132,13 @@ public class ComposeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Bundle location_data = getArguments();
-        latitude = location_data.getDouble("latitude");
-        longitude = location_data.getDouble("longitude");
-        address = location_data.getString("address");
-        city = location_data.getString("city");
-        state = location_data.getString("state");
-        postalCode = location_data.getString("postalCode");
-        country = location_data.getString("country");
+        latitude = locationData.getLatitude();
+        longitude = locationData.getLongitude();
+        address = locationData.getAddress();
+        city = locationData.getCity();
+        state = locationData.getState();
+        postalCode = locationData.getPostalCode();
+        country = locationData.getCountry();
 
         // Create an instance of FirebaseStorage
         storage = FirebaseStorage.getInstance();
@@ -198,7 +197,7 @@ public class ComposeFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 // by this point we have the camera photo on disk
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                // RESIZE BITMAP, see section below
+                // Rotate the Bitmap picture
                 Bitmap correctImage = rotateBitmapOrientation(takenImage);
                 // Load the taken image into a preview
                 fragmentComposeBinding.ivPostImage.setImageBitmap(correctImage);
@@ -325,7 +324,7 @@ public class ComposeFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(getContext(), "Created new post", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Created newPostReference post", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getContext(), "Post failed", Toast.LENGTH_SHORT).show();
                 }
