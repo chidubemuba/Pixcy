@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         Intent intent = getIntent();
         userId = intent.getStringExtra("userId");
         user = Parcels.unwrap(intent.getParcelableExtra("user"));
-        System.out.println("user information: " + user.getUsername() + ", " + user.getEmail() + "," + user.getDob());
+//        System.out.println("user information: " + user.getUsername() + ", " + user.getEmail() + "," + user.getDob());
         ExecutorService executorService = Executors.newSingleThreadExecutor();
 
         activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());

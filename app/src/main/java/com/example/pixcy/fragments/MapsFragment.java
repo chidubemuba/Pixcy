@@ -3,6 +3,8 @@ package com.example.pixcy.fragments;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.fragment.app.Fragment;
 
 import android.content.Context;
@@ -24,6 +26,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.pixcy.LocationData;
 import com.example.pixcy.R;
 import com.example.pixcy.models.Post;
@@ -211,7 +216,7 @@ public class MapsFragment extends Fragment {
                                 System.out.println("Add marker is working");
                                 map.addMarker(new MarkerOptions().position(new LatLng(filteredPost.getLatitude(), filteredPost.getLongitude()))
                                         .snippet(filteredPost.getDescription())
-                                        .title("this is a post").icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                                        .title("Post").icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
                             } else {
                                 Log.e(TAG, "error in getMarkerBitmapFromView", e);
                             }
@@ -222,30 +227,9 @@ public class MapsFragment extends Fragment {
         });
     }
 
-    /***
-     * Code adopted from StackOverflow: https://stackoverflow.com/questions/22139515/set-marker-icon-on-google-maps-v2-android-from-url
-     *
-     */
-
-    private interface GetBitmapFromLinkCallback {
-        void done(Bitmap bitmap, Exception exception);
-    }
-
-    public Bitmap getBitMapFromLink(String remotePath) throws IOException {
-        URL url = new URL(remotePath);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        try {
-            connection.connect();
-        } catch (Exception e) {
-            Log.v("MAP-FRAGMENT", e.toString());
-        }
-        InputStream input = connection.getInputStream();
-        Bitmap imageBitmap = BitmapFactory.decodeStream(input);
-        return imageBitmap;
-    }
-
     /**
      * * Code adopted from: https://stackoverflow.com/questions/14811579/how-to-create-a-custom-shaped-bitmap-marker-with-android-map-api-v2
+     * https://stackoverflow.com/questions/25278821/how-to-round-an-image-with-glide-library
      * //
      */
     private interface GetMarkerBitmapFromViewCallback{
@@ -258,8 +242,6 @@ public class MapsFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    Bitmap image = getBitMapFromLink(post.getImage_url());
-
                     mCustomMarkerView = requireActivity().getLayoutInflater().inflate(R.layout.view_custom_marker, null);
                     //TextView markerSnippet = (TextView)  mCustomMarkerView.findViewById(R.id.markerSnippet);
                     ImageView markerImageView = (ImageView) mCustomMarkerView.findViewById(R.id.profile_image);
@@ -267,19 +249,24 @@ public class MapsFragment extends Fragment {
                     requireActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            markerImageView.setImageBitmap(image);
-                            mCustomMarkerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-                            mCustomMarkerView.layout(0, 0, mCustomMarkerView.getMeasuredWidth(), mCustomMarkerView.getMeasuredHeight());
-                            mCustomMarkerView.buildDrawingCache();
-                            Bitmap returnedBitmap = Bitmap.createBitmap(mCustomMarkerView.getMeasuredWidth(), mCustomMarkerView.getMeasuredHeight(),
-                                    Bitmap.Config.ARGB_8888);
-                            Canvas canvas = new Canvas(returnedBitmap);
-                            canvas.drawColor(Color.WHITE, PorterDuff.Mode.SRC_IN);
-                            Drawable drawable = mCustomMarkerView.getBackground();
-                            if (drawable != null)
-                                drawable.draw(canvas);
-                            mCustomMarkerView.draw(canvas);
-                            callback.done(returnedBitmap, null);
+
+                            Glide.with(getContext())
+                                    .asBitmap()
+                                    .load(post.getImage_url())
+                                    .circleCrop()
+                                    .into(new SimpleTarget<Bitmap>() {
+                                        @Override
+                                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                            final float scale = getContext().getResources().getDisplayMetrics().density;
+                                            int pixels = (int) (50 * scale + 0.5f);
+                                            Bitmap bitmap = Bitmap.createScaledBitmap(resource, pixels, pixels, true);
+                                            RoundedBitmapDrawable circularBitmapDrawable =
+                                                    RoundedBitmapDrawableFactory.create(getContext().getResources(), resource);
+                                            circularBitmapDrawable.setCircular(true);
+                                            markerImageView.setImageDrawable(circularBitmapDrawable);
+                                            callback.done(bitmap, null);
+                                        }
+                                    });
                         }
                     });
                 } catch (Exception e){

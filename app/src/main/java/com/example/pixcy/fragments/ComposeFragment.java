@@ -59,6 +59,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -146,6 +148,7 @@ public class ComposeFragment extends Fragment {
         storageRef = storage.getReference();
         // Create a reference to 'images/mountains.jpg'
         mountainImagesRef = storageRef.child("images/" + UUID.randomUUID() + ".jpg");
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
 
         fragmentComposeBinding.btnCaptureImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,7 +169,12 @@ public class ComposeFragment extends Fragment {
                     Toast.makeText(getContext(), "There's no image!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                uploadPhoto();
+                executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        uploadPhoto();
+                    }
+                });
             }
         });
     }
@@ -324,9 +332,9 @@ public class ComposeFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(getContext(), "Created newPostReference post", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(), "Created newPostReference post", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getContext(), "Post failed", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(), "Post failed", Toast.LENGTH_SHORT).show();
                 }
             }
         });
