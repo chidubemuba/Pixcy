@@ -9,13 +9,6 @@ import androidx.fragment.app.Fragment;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.StrictMode;
@@ -46,10 +39,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.parceler.Parcels;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -61,6 +50,7 @@ public class MapsFragment extends Fragment {
 
     /**
      * Request code for location permission request.
+     *
      * @see #onRequestPermissionsResult(int, String[], int[])
      */
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -72,10 +62,8 @@ public class MapsFragment extends Fragment {
     private boolean permissionDenied = false;
     private GoogleMap map;
     private List<Post> posts = new ArrayList<>();
-    private String image_url;
     private double latitude;
     private double longitude;
-    private double currentZoom;
     View mCustomMarkerView;
     private LocationData locationData;
     public static final String ARG_PARAM1 = "param1";
@@ -94,7 +82,7 @@ public class MapsFragment extends Fragment {
         MapsFragment fragment = new MapsFragment();
         Bundle args = new Bundle();
         ArrayList<Parcelable> parcelableArrayList = new ArrayList<>();
-        for(Post post: posts){
+        for (Post post : posts) {
             parcelableArrayList.add(Parcels.wrap(post));
         }
         args.putParcelableArrayList(ARG_PARAM1, parcelableArrayList);
@@ -106,11 +94,11 @@ public class MapsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null){
+        if (getArguments() != null) {
             locationData = Parcels.unwrap(getArguments().getParcelable(ARG_PARAM2));
             ArrayList<Parcelable> parcelableArrayList = getArguments().getParcelableArrayList(ARG_PARAM1);
             posts = new ArrayList<>();
-            for(Parcelable item: parcelableArrayList){
+            for (Parcelable item : parcelableArrayList) {
                 posts.add(Parcels.unwrap(item));
             }
         }
@@ -150,9 +138,9 @@ public class MapsFragment extends Fragment {
                         @Override
                         public void onCameraIdle() {
                             ZoomLevel currentZoomLevel = getZoomLevel(googleMap.getCameraPosition().zoom);
-                            System.out.println("camera zoom level: " + currentZoomLevel.toString() + "ZOOM: "+googleMap.getCameraPosition().zoom);
+                            System.out.println("camera zoom level: " + currentZoomLevel.toString() + "ZOOM: " + googleMap.getCameraPosition().zoom);
                             // if zoom has entered another level - state, city, country, replace markers
-                            if (currentZoomLevel != zoomLevel){
+                            if (currentZoomLevel != zoomLevel) {
                                 zoomLevel = currentZoomLevel;
                                 System.out.println("current zoom level: " + zoomLevel.toString());
                                 addMarkers(map);
@@ -167,36 +155,36 @@ public class MapsFragment extends Fragment {
     private void addMarkers(GoogleMap map) {
         Log.d(TAG, "addMarks ran ");
         ArrayList<Post> filteredPosts = new ArrayList<>();
-        switch (zoomLevel){
+        switch (zoomLevel) {
             case CITY:
                 Set<String> citySet = new HashSet<String>();
-                for(Post post: posts){
-                    if (!citySet.contains(post.getCity())){
+                for (Post post : posts) {
+                    if (!citySet.contains(post.getCity())) {
                         citySet.add(post.getCity());
                         filteredPosts.add(post);
                     }
                 }
-                System.out.println("City: " +filteredPosts.get(0));
+                System.out.println("City: " + filteredPosts.get(0));
                 break;
             case STATE:
                 Set<String> stateSet = new HashSet<String>();
-                for(Post post: posts){
-                    if (!stateSet.contains(post.getState())){
+                for (Post post : posts) {
+                    if (!stateSet.contains(post.getState())) {
                         stateSet.add(post.getState());
                         filteredPosts.add(post);
                     }
                 }
-                System.out.println("State: " +filteredPosts.get(0));
+                System.out.println("State: " + filteredPosts.get(0));
                 break;
             case COUNTRY:
                 Set<String> countrySet = new HashSet<String>();
-                for(Post post: posts){
-                    if (!countrySet.contains(post.getCountry())){
+                for (Post post : posts) {
+                    if (!countrySet.contains(post.getCountry())) {
                         countrySet.add(post.getCountry());
                         filteredPosts.add(post);
                     }
                 }
-                System.out.println("Country: " +filteredPosts.get(0));
+                System.out.println("Country: " + filteredPosts.get(0));
                 break;
             default:
                 // do city
@@ -207,12 +195,12 @@ public class MapsFragment extends Fragment {
             @Override
             public void run() {
                 System.out.println("filtered posts length: " + filteredPosts.size());
-                for(Post filteredPost: filteredPosts){
+                for (Post filteredPost : filteredPosts) {
                     System.out.println("filtered post: " + filteredPost);
                     getMarkerBitmapFromView(filteredPost, new GetMarkerBitmapFromViewCallback() {
                         @Override
                         public void done(Bitmap bitmap, Exception e) {
-                            if (e == null){
+                            if (e == null) {
                                 System.out.println("Add marker is working");
                                 map.addMarker(new MarkerOptions().position(new LatLng(filteredPost.getLatitude(), filteredPost.getLongitude()))
                                         .snippet(filteredPost.getDescription())
@@ -229,10 +217,11 @@ public class MapsFragment extends Fragment {
 
     /**
      * * Code adopted from: https://stackoverflow.com/questions/14811579/how-to-create-a-custom-shaped-bitmap-marker-with-android-map-api-v2
+     * https://stackoverflow.com/questions/48906924/load-image-with-glide-to-google-maps-marker/49296686#49296686
      * https://stackoverflow.com/questions/25278821/how-to-round-an-image-with-glide-library
      * //
      */
-    private interface GetMarkerBitmapFromViewCallback{
+    private interface GetMarkerBitmapFromViewCallback {
         void done(Bitmap bitmap, Exception e);
     }
 
@@ -269,7 +258,7 @@ public class MapsFragment extends Fragment {
                                     });
                         }
                     });
-                } catch (Exception e){
+                } catch (Exception e) {
                     callback.done(null, e);
                 }
             }

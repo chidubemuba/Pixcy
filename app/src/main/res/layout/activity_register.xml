@@ -52,11 +52,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/etRegisterFullName"
+            android:layout_marginTop="10dp"
+            android:padding="6dp"
             android:text="Username*"
             android:textColor="@color/dark_gray"
-            android:padding="6dp"
-            android:textSize="16sp"
-            android:layout_marginTop="10dp"/>
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/etRegisterUsername"
@@ -70,15 +70,48 @@
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/tvRegisterEmail"
+            android:id="@+id/tvRegisterBio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/etRegisterUsername"
+            android:layout_marginTop="10dp"
+            android:padding="6dp"
+            android:text="Bio*"
+            android:textColor="@color/dark_gray"
+            android:textSize="16sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tfBio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:counterEnabled="true"
+            app:counterMaxLength="210"
+            android:layout_below="@+id/tvRegisterBio" >
+
+            <EditText
+                android:id="@+id/etRegisterBio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvRegisterBio"
+                android:background="@drawable/border2"
+                android:hint="Enter your bio"
+                android:inputType="textPersonName"
+                android:padding="6dp"
+                android:textSize="16sp"
+                android:minLines="5" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/tvRegisterEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tfBio"
+            android:layout_marginTop="10dp"
+            android:padding="6dp"
             android:text="Email*"
             android:textColor="@color/dark_gray"
-            android:padding="6dp"
-            android:textSize="16sp"
-            android:layout_marginTop="10dp"/>
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/etRegisterEmail"

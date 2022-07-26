@@ -70,7 +70,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         @Override
         public void onClick(View v) {
             //gets item position
-            Toast.makeText(itemView.getContext(), "This clicks",Toast.LENGTH_SHORT).show();
+            Toast.makeText(itemView.getContext(), "Post detail",Toast.LENGTH_SHORT).show();
             Log.i(TAG, "onClick: this works ");
             int position = getAdapterPosition();
             if(position != RecyclerView.NO_POSITION){

@@ -52,13 +52,13 @@ public class MemoriesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        fragmentMemoriesBinding = FragmentMemoriesBinding.inflate(getLayoutInflater(),container, false);
+        fragmentMemoriesBinding = FragmentMemoriesBinding.inflate(getLayoutInflater(), container, false);
         View view = fragmentMemoriesBinding.getRoot();
         return view;
     }
 
     @Override
-    public void onDestroyView(){
+    public void onDestroyView() {
         super.onDestroyView();
         fragmentMemoriesBinding = null;
     }
@@ -67,7 +67,7 @@ public class MemoriesFragment extends Fragment {
         MemoriesFragment memoriesFragment = new MemoriesFragment();
         Bundle args = new Bundle();
         ArrayList<Parcelable> parcelableArrayList = new ArrayList<>();
-        for(Post post: posts){
+        for (Post post : posts) {
             parcelableArrayList.add(Parcels.wrap(post));
         }
         args.putParcelableArrayList(ARG_PARAM1, parcelableArrayList);
@@ -79,11 +79,11 @@ public class MemoriesFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null){
+        if (getArguments() != null) {
             user = Parcels.unwrap(getArguments().getParcelable(ARG_PARAM2));
             ArrayList<Parcelable> parcelableArrayList = getArguments().getParcelableArrayList(ARG_PARAM1);
             posts = new ArrayList<>();
-            for(Parcelable item: parcelableArrayList){
+            for (Parcelable item : parcelableArrayList) {
                 posts.add(Parcels.unwrap(item));
             }
         }
@@ -100,30 +100,7 @@ public class MemoriesFragment extends Fragment {
         fragmentMemoriesBinding.rvPosts.setLayoutManager(new GridLayoutManager(getContext(), 3));
         fragmentMemoriesBinding.rvPosts.setAdapter(adapter);
         fragmentMemoriesBinding.tvUsername.setText(user.getUsername());
+        fragmentMemoriesBinding.tvBio.setText(user.getBio());
 
-        // Lookup the swipe container view
-        swipeRefreshLayout = view.findViewById(R.id.swipeContainer);
-
-        fragmentMemoriesBinding.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                fetchTimelineAsync(0);
-            }
-        });
-
-        // Configure the refreshing colors
-        fragmentMemoriesBinding.swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
     }
-
-    private void fetchTimelineAsync(int i) {
-        adapter.clear();
-        posts.clear();
-        // todo: create a method in parent activity to fetch posts and use a callback to pass the posts to this fragment
-        fragmentMemoriesBinding.swipeContainer.setRefreshing(false);
-    }
-
-
 }

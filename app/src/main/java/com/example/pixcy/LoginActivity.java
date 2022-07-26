@@ -36,6 +36,8 @@ import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -61,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
+            activityLoginBinding.pbLogin.setVisibility(View.VISIBLE);
             login(currentUser);
         } else {
             // Show Hide password using Eye Icon
@@ -145,18 +148,16 @@ public class LoginActivity extends AppCompatActivity {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithEmail: failure", task.getException());
                     Toast.makeText(LoginActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
+                    activityLoginBinding.pbLogin.setVisibility(View.GONE);
                 }
-                activityLoginBinding.pbLogin.setVisibility(View.GONE);
             }
         });
     }
 
     private void login(FirebaseUser firebaseUser) {
-        mUser = firebaseUser;
-
         FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
         // Create a reference to the users document
-        DocumentReference docRef = firestoredb.collection("users").document(mUser.getUid());
+        DocumentReference docRef = firestoredb.collection("users").document(firebaseUser.getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -168,8 +169,9 @@ public class LoginActivity extends AppCompatActivity {
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         // To prevent user from returning back to Login Activity on pressing back button after logging in.
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.putExtra("userId", mUser.getUid());
+                        intent.putExtra("userId", firebaseUser.getUid());
                         intent.putExtra("user", Parcels.wrap(user));
+                        activityLoginBinding.pbLogin.setVisibility(View.GONE);
                         startActivity(intent);
                         finish(); // to close Login Activity
                     } else {

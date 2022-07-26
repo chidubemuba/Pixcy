@@ -41,6 +41,7 @@ public class Register_Activity extends AppCompatActivity {
     private ActivityRegisterBinding activityRegisterBinding;
     private RadioButton rbRegisterGenderSelected;
     private DatePickerDialog picker;
+    public static final int MAX_BIO_LENGTH = 210;
     public static final String TAG = "Register_Activity";
 
     @Override
@@ -88,6 +89,7 @@ public class Register_Activity extends AppCompatActivity {
                 // Obtain the data entered by the user
                 String textFullName = activityRegisterBinding.etRegisterFullName.getText().toString();
                 String textUsername = activityRegisterBinding.etRegisterUsername.getText().toString();
+                String textBio = activityRegisterBinding.etRegisterBio.getText().toString();
                 String textEmail = activityRegisterBinding.etRegisterEmail.getText().toString();
                 String textDOB = activityRegisterBinding.etRegisterDOB.getText().toString();
                 String textPassword = activityRegisterBinding.etRegisterPassword.getText().toString();
@@ -103,6 +105,14 @@ public class Register_Activity extends AppCompatActivity {
                     Toast.makeText(Register_Activity.this, "Please enter your username", Toast.LENGTH_SHORT).show();
                     activityRegisterBinding.etRegisterUsername.setError("Username is required");
                     activityRegisterBinding.etRegisterUsername.requestFocus();
+                } else if (TextUtils.isEmpty(textBio)) {
+                    Toast.makeText(Register_Activity.this, "Please enter your bio", Toast.LENGTH_SHORT).show();
+                    activityRegisterBinding.etRegisterBio.setError("Bio is required");
+                    activityRegisterBinding.etRegisterBio.requestFocus();
+                } else if (textBio.length() > MAX_BIO_LENGTH) {
+                    Toast.makeText(Register_Activity.this, "Bio should be at most 210 characters", Toast.LENGTH_SHORT).show();
+                    activityRegisterBinding.etRegisterBio.setError("Bio is too long");
+                    activityRegisterBinding.etRegisterBio.requestFocus();
                 } else if (TextUtils.isEmpty(textEmail)) {
                     Toast.makeText(Register_Activity.this, "Please enter your email", Toast.LENGTH_SHORT).show();
                     activityRegisterBinding.etRegisterEmail.setError("Email is required");
@@ -141,14 +151,14 @@ public class Register_Activity extends AppCompatActivity {
                 } else {
                     textGender = rbRegisterGenderSelected.getText().toString();
                     activityRegisterBinding.pbRegister.setVisibility(View.VISIBLE);
-                    registerUser(textFullName, textUsername, textEmail, textDOB, textGender, textPassword);
+                    registerUser(textFullName, textUsername, textBio, textEmail, textDOB, textGender, textPassword);
                 }
             }
         });
     }
 
     // Register User using the credentials given
-    private void registerUser(String textFullName, String textUsername, String textEmail, String textDOB, String textGender, String textPassword) {
+    private void registerUser(String textFullName, String textUsername, String textBio, String textEmail, String textDOB, String textGender, String textPassword) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
 
         // Create User Profile
@@ -165,7 +175,7 @@ public class Register_Activity extends AppCompatActivity {
                     FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
 
                     // Enter User Data into the Firebase Firestore Database.
-                    User user = new User(textDOB, textEmail, textGender, textUsername);
+                    User user = new User(textBio, textDOB, textEmail, textGender, textUsername);
                     firestoredb.collection("users")
                             .document(firebaseUser.getUid())
                             .set(user)

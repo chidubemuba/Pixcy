@@ -5,6 +5,7 @@ import org.parceler.Parcel;
 @Parcel
 public class User {
     private String username;
+    private String bio;
     private String gender;
     private String email;
     private String dob;
@@ -14,13 +15,20 @@ public class User {
 
     }
 
-    public User(String dob, String email, String gender, String username) {
+    public User(String bio, String dob, String email, String gender, String username) {
+        this.bio = bio;
         this.dob = dob;
         this.email = email;
         this.gender = gender;
         this.username = username;
     }
 
+    public String getBio() {
+        return bio;
+    }
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
     public String getDob() {
         return dob;
     }
@@ -48,8 +56,8 @@ public class User {
 
     @Override
     public String toString() {
-        return "User {" + "username: " + this.username + '\'' + "gender: " + this.gender
-                + '\'' + "email: " + this.email + '\'' + "dob :" + this.dob + '}';
+        return "User {" + "username: " + this.username + '\'' + "bio: " + this.bio + "gender: "
+                + this.gender + '\'' + "email: " + this.email + '\'' + "dob :" + this.dob + '}';
     }
 
 }
