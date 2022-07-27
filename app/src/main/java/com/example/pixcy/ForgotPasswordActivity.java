@@ -32,7 +32,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         View view = activityForgotPasswordBinding.getRoot();
         setContentView(view);
 
-        getSupportActionBar().setTitle("Forgot Password");
+        getSupportActionBar().setTitle("Forgot/Update Password");
 
         activityForgotPasswordBinding.btnResetPassword.setOnClickListener(new View.OnClickListener() {
             @Override

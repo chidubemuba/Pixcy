@@ -192,20 +192,29 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_logout, menu);
+        getMenuInflater().inflate(R.menu.common_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_logout) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_change_password) {
+            Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
+        }
+//        else if (id == R.id.action_update_email) {
+//            Intent intent = new Intent(MainActivity.this, UpdateEmailActivity.class);
+//            startActivity(intent);
+//        }
+        else if (id == R.id.action_logout) {
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             // To prevent user from returning back to Main Activity on pressing back button after logging out.
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
-            return true;
         }
         return super.onOptionsItemSelected(item);
     }
