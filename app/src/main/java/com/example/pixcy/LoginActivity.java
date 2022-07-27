@@ -1,8 +1,10 @@
 package com.example.pixcy;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -62,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
+        if(currentUser != null && currentUser.isEmailVerified()){
             activityLoginBinding.pbLogin.setVisibility(View.VISIBLE);
             login(currentUser);
         } else {
@@ -110,6 +112,15 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
 
+            // Reset Password
+            activityLoginBinding.tvForgotPassword.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+                    startActivity(intent);
+                }
+            });
+
             // Register User
             activityLoginBinding.btnRegister.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -130,8 +141,17 @@ public class LoginActivity extends AppCompatActivity {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithEmail: success");
                     FirebaseUser user = mAuth.getCurrentUser();
-                    login(user);
-                    Toast.makeText(LoginActivity.this, "Log in successful", Toast.LENGTH_SHORT).show();
+
+                    // Check if email is verified before user can access their profile
+                    if (user.isEmailVerified()) {
+                        login(user);
+                        Toast.makeText(LoginActivity.this, "Log in successful", Toast.LENGTH_SHORT).show();
+                    } else {
+                        user.sendEmailVerification();
+                        activityLoginBinding.pbLogin.setVisibility(View.GONE);
+                        mAuth.signOut(); // sign out user
+                        showAlertDialog();
+                    }
                 } else {
                     try {
                         throw task.getException();
@@ -182,5 +202,29 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void showAlertDialog() {
+        // Setup the Alert Builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+        builder.setTitle("Email Not Verified");
+        builder.setMessage("Please verify your email now. You can not login without email verification.");
+
+        // Open email apps if user clicks/taps continue button
+        builder.setPositiveButton("Continue to email", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_APP_EMAIL);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // To open email app in new window and not within our app
+                startActivity(intent);
+            }
+        });
+
+        // Create the AlertDialog
+        AlertDialog alertDialog = builder.create();
+
+        // Show the AlertDialog
+        alertDialog.show();
     }
 }

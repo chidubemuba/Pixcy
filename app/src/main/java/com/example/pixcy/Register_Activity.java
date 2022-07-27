@@ -41,7 +41,7 @@ public class Register_Activity extends AppCompatActivity {
     private ActivityRegisterBinding activityRegisterBinding;
     private RadioButton rbRegisterGenderSelected;
     private DatePickerDialog picker;
-    public static final int MAX_BIO_LENGTH = 210;
+    public static final int MAX_BIO_LENGTH = 180;
     public static final String TAG = "Register_Activity";
 
     @Override
@@ -110,7 +110,7 @@ public class Register_Activity extends AppCompatActivity {
                     activityRegisterBinding.etRegisterBio.setError("Bio is required");
                     activityRegisterBinding.etRegisterBio.requestFocus();
                 } else if (textBio.length() > MAX_BIO_LENGTH) {
-                    Toast.makeText(Register_Activity.this, "Bio should be at most 210 characters", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register_Activity.this, "Bio should be at most 180 characters", Toast.LENGTH_SHORT).show();
                     activityRegisterBinding.etRegisterBio.setError("Bio is too long");
                     activityRegisterBinding.etRegisterBio.requestFocus();
                 } else if (TextUtils.isEmpty(textEmail)) {
@@ -168,6 +168,10 @@ public class Register_Activity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     FirebaseUser firebaseUser = auth.getCurrentUser();
 
+                    // Send Verification Email
+                    firebaseUser.sendEmailVerification();
+                    Toast.makeText(Register_Activity.this, "User registered successfully. Please verify your email", Toast.LENGTH_SHORT).show();
+
                     // Update display name of user
                     UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(textFullName).build();
                     firebaseUser.updateProfile(profileChangeRequest);
@@ -183,9 +187,6 @@ public class Register_Activity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(Void unused) {
                                     Log.d(TAG, "DocumentSnapshot successfully written!");
-                                    // Send Verification Email
-                                    firebaseUser.sendEmailVerification();
-                                    Toast.makeText(Register_Activity.this, "User registered successfully. Please verify your email", Toast.LENGTH_SHORT).show();
 
                                     // Open User Profile after successful registration
                                     Intent intent = new Intent(Register_Activity.this, MainActivity.class);

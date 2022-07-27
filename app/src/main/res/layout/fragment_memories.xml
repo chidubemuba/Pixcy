@@ -17,6 +17,7 @@
             android:id="@+id/ivProfileBackground"
             android:layout_width="match_parent"
             android:layout_height="165dp"
+            android:layout_alignEnd="@+id/cvProfile"
             android:adjustViewBounds="false"
             android:scaleType="centerCrop"
             app:srcCompat="@drawable/background_image_5" />
@@ -55,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/tvUsername"
-            android:layout_alignEnd="@+id/ivProfileBackground"
+            android:layout_alignEnd="@+id/cvProfile"
             android:layout_marginStart="170dp"
             android:layout_marginTop="40dp"
             android:layout_marginEnd="10dp"
@@ -69,8 +70,8 @@
         android:id="@+id/rvPosts"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="4dp"
-        android:layout_below="@+id/cvProfile" />
+        android:layout_below="@+id/cvProfile"
+        android:padding="4dp" />
 
 
 </RelativeLayout>

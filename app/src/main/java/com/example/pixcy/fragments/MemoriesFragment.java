@@ -1,13 +1,11 @@
 package com.example.pixcy.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Parcelable;
@@ -17,13 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.pixcy.DetailActivity;
 import com.example.pixcy.PostsAdapter;
-import com.example.pixcy.R;
 import com.example.pixcy.databinding.FragmentMemoriesBinding;
 import com.example.pixcy.models.Post;
 import com.example.pixcy.models.User;
-
 
 import org.parceler.Parcels;
 
@@ -101,6 +96,12 @@ public class MemoriesFragment extends Fragment {
         fragmentMemoriesBinding.rvPosts.setAdapter(adapter);
         fragmentMemoriesBinding.tvUsername.setText(user.getUsername());
         fragmentMemoriesBinding.tvBio.setText(user.getBio());
-
+        fragmentMemoriesBinding.ivProfilePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "This clicks", Toast.LENGTH_SHORT).show();
+                Log.i(TAG, "This clicks");
+            }
+        });
     }
 }

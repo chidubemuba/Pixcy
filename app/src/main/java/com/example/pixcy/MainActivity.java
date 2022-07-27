@@ -74,10 +74,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public String country;
     private FusedLocationProviderClient fusedLocationClient;
 
-    private interface GetUserCallback {
-        void done(User user, Exception e);
-    }
-
     private interface GetPostsCallback {
         void done(List<Post> posts, Exception e);
     }
@@ -197,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_logout, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

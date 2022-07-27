@@ -87,13 +87,25 @@
             android:textSize="16sp"
             android:background="@drawable/border2" />
 
+        <TextView
+            android:id="@+id/tvForgotPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/etLoginPassword"
+            android:layout_marginTop="20dp"
+            android:padding="6dp"
+            android:text="*Forgot Password? Click Here*"
+            android:textAlignment="center"
+            android:textColor="@color/purple_700"
+            android:textSize="16sp" />
+
         <Button
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Login"
-            android:layout_below="@+id/etLoginPassword"
-            android:layout_marginTop="50dp"
+            android:layout_below="@+id/tvForgotPassword"
+            android:layout_marginTop="40dp"
             android:layout_marginRight="70dp"
             android:layout_marginLeft="70dp" />
 
