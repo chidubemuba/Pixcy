@@ -32,16 +32,16 @@
             android:layout_width="180dp"
             android:layout_height="180dp"
             android:layout_below="@+id/tvRegisterHead"
+            android:layout_centerHorizontal="true"
             android:layout_marginStart="5dp"
             android:layout_marginTop="15dp"
-            android:layout_centerHorizontal="true"
             android:elevation="10dp"
             android:padding="10dp"
             android:src="@drawable/profilepiccover"
-            app:civ_circle_background_color="@color/white"
             app:civ_border_color="@color/white"
             app:civ_border_overlay="false"
-            app:civ_border_width="4dp" />
+            app:civ_border_width="4dp"
+            app:civ_circle_background_color="@color/white" />
 
         <TextView
             android:id="@+id/tvRegisterFullName"

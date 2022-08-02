@@ -41,9 +41,7 @@ public class ProfilePictureActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (uriImage != null) {
                     Intent data = new Intent();
-                    Log.d(TAG, "Uri: " + uriImage);
-                    Log.d(TAG, "Uri string: " + image_url);
-                    data.putExtra("image_url", image_url);
+                    Log.i(TAG, "Uri: " + uriImage);
                     data.putExtra("uriImage", uriImage);
                     setResult(RESULT_OK, data);
                     finish();

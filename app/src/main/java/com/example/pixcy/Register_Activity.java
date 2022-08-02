@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -20,8 +22,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.pixcy.databinding.ActivityRegisterBinding;
-import com.example.pixcy.models.Post;
 import com.example.pixcy.models.User;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -40,8 +42,8 @@ import com.google.firebase.storage.UploadTask;
 
 import org.parceler.Parcels;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
-import java.util.List;
 
 public class Register_Activity extends AppCompatActivity {
 
@@ -52,13 +54,12 @@ public class Register_Activity extends AppCompatActivity {
     public static final String TAG = "Register_Activity";
     private final int REQUEST_CODE = 20;
     private Uri uriImages;
-    private String image_url;
     FirebaseStorage storage;
     StorageReference storageRef;
 
-//    private interface GetUriCallback {
-//        void done(Uri uri, Exception e);
-//    }
+    private interface GetUriCallback {
+        void done(Uri uri, Exception e);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,9 +113,8 @@ public class Register_Activity extends AppCompatActivity {
                 String textPassword = activityRegisterBinding.etRegisterPassword.getText().toString();
                 String textConfirmPassword = activityRegisterBinding.etRegisterConfirmPassword.getText().toString();
                 String textGender; // Can't obtain the value before verifying if any button was selected or not
-                String textImageUrl = activityRegisterBinding.ivRegisterProfilePic.toString();
 
-                if (TextUtils.isEmpty(textImageUrl)) {
+                if (uriImages == null) {
                     Toast.makeText(Register_Activity.this, "Please select a profile picture", Toast.LENGTH_SHORT).show();
                 } else if (TextUtils.isEmpty(textFullName)) {
                     Toast.makeText(Register_Activity.this, "Please enter your full name", Toast.LENGTH_SHORT).show();
@@ -170,7 +170,12 @@ public class Register_Activity extends AppCompatActivity {
                 } else {
                     textGender = rbRegisterGenderSelected.getText().toString();
                     activityRegisterBinding.pbRegister.setVisibility(View.VISIBLE);
-                    registerUser(textFullName, textUsername, textBio, textEmail, textDOB, textGender, textPassword, textImageUrl);
+                    uploadPhoto(new GetUriCallback() {
+                        @Override
+                        public void done(Uri uri, Exception e) {
+                            registerUser(textFullName, textUsername, textBio, textEmail, textDOB, textGender, textPassword, uri.toString());
+                        }
+                    }, textEmail);
                 }
             }
         });
@@ -180,13 +185,10 @@ public class Register_Activity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-            uriImages = data.getData();
-            image_url = data.getStringExtra("image_url");
-            Log.d(TAG, "Uri: " + uriImages);
-            Log.d(TAG, "Uri String: " + image_url);
-            Glide.with(Register_Activity.this).load(image_url).into(activityRegisterBinding.ivRegisterProfilePic);
-            Log.d(TAG, "Profile pic url: " + activityRegisterBinding.ivRegisterProfilePic.toString());
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data!= null) {
+            uriImages = data.getParcelableExtra("uriImage");
+            Log.i(TAG, "Image data: " + uriImages);
+            Glide.with(Register_Activity.this).load(uriImages).into(activityRegisterBinding.ivRegisterProfilePic);
         }
     }
 
@@ -255,36 +257,57 @@ public class Register_Activity extends AppCompatActivity {
         });
     }
 
-    private void UploadPic(FirebaseUser firebaseUser) {
-        if (uriImage != null) {
-            storage = FirebaseStorage.getInstance();
-            storageRef = storage.getReference("ProfilePic");
-            StorageReference fileReference = storageRef.child(firebaseUser.getUid() + "." + getFileExtension(uriImage));
-            fileReference.putFile(uriImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            Uri downloadUri = uri;
+    // Upload photo to Firebase Storage and retrieve photo url of uploaded image
+    private void uploadPhoto(GetUriCallback getUriCallback, String email) {
+        storage = FirebaseStorage.getInstance();
+        storageRef = storage.getReference("ProfilePic");
+        StorageReference fileReference = storageRef.child(email + "." + getFileExtension(uriImages));
+        // Get the data from an ImageView as bytes
+        activityRegisterBinding.ivRegisterProfilePic.setDrawingCacheEnabled(true);
+        activityRegisterBinding.ivRegisterProfilePic.buildDrawingCache();
+        Bitmap bitmap = ((BitmapDrawable) activityRegisterBinding.ivRegisterProfilePic.getDrawable()).getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
 
-                            //Finally set the display image of the user after upload
-                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                    .setPhotoUri(downloadUri).build();
-                            firebaseUser.updateProfile(profileUpdates);
-                            Toast.makeText(Register_Activity.this, "Image upload successful", Toast.LENGTH_SHORT).show();
+        UploadTask uploadTask = fileReference.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+                Log.e(TAG, "Post failed", exception);
+                Toast.makeText(Register_Activity.this, "Failed" + exception.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                Toast.makeText(Register_Activity.this, "Image uploaded", Toast.LENGTH_SHORT).show();
+                // Retrieve image url of the uploaded image
+                Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                    @Override
+                    public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
                         }
-                    });
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(Register_Activity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        } else {
-            Toast.makeText(Register_Activity.this, "No picture selected", Toast.LENGTH_SHORT).show();
-        }
+                        Log.i(TAG, "result: " + fileReference.getDownloadUrl());
+                        return fileReference.getDownloadUrl();
+                    }
+                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            Uri downloadUri = task.getResult();
+                            Log.i(TAG, "result check: " + downloadUri);
+                            getUriCallback.done(downloadUri, null);
+                        } else {
+                            Log.e(TAG, "Failed to get Uri");
+                            getUriCallback.done(null, task.getException());
+                        }
+                    }
+                });
+            }
+        });
     }
 
     private String getFileExtension(Uri uri) {
