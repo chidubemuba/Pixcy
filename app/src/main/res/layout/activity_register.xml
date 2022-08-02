@@ -11,7 +11,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:padding="15dp"
         android:layout_margin="15dp"
         android:background="@color/white">
@@ -20,21 +20,39 @@
             android:id="@+id/tvRegisterHead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="20dp"
+            android:layout_alignParentTop="true"
+            android:gravity="center"
             android:text="Please enter your details to register on the App"
             android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/ivRegisterProfilePic"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_below="@+id/tvRegisterHead"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="15dp"
+            android:layout_centerHorizontal="true"
+            android:elevation="10dp"
+            android:padding="10dp"
+            android:src="@drawable/profilepiccover"
+            app:civ_circle_background_color="@color/white"
+            app:civ_border_color="@color/white"
+            app:civ_border_overlay="false"
+            app:civ_border_width="4dp" />
 
         <TextView
             android:id="@+id/tvRegisterFullName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tvRegisterHead"
+            android:layout_below="@+id/ivRegisterProfilePic"
+            android:layout_marginTop="15dp"
+            android:padding="6dp"
             android:text="Full Name*"
             android:textColor="@color/dark_gray"
-            android:padding="6dp"
-            android:textSize="16sp"
-            android:layout_marginTop="50dp"/>
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/etRegisterFullName"
@@ -52,7 +70,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/etRegisterFullName"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:padding="6dp"
             android:text="Username*"
             android:textColor="@color/dark_gray"
@@ -74,7 +92,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/etRegisterUsername"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:padding="6dp"
             android:text="Bio*"
             android:textColor="@color/dark_gray"
@@ -107,7 +125,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tfBio"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:padding="6dp"
             android:text="Email*"
             android:textColor="@color/dark_gray"
@@ -133,7 +151,7 @@
             android:textColor="@color/dark_gray"
             android:padding="6dp"
             android:textSize="16sp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="5dp"/>
 
         <EditText
             android:id="@+id/etRegisterDOB"
@@ -156,7 +174,7 @@
             android:textColor="@color/dark_gray"
             android:padding="6dp"
             android:textSize="16sp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="5dp"/>
 
 
         <RadioGroup
@@ -194,7 +212,7 @@
             android:textColor="@color/dark_gray"
             android:padding="6dp"
             android:textSize="16sp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="5dp"/>
 
         <EditText
             android:id="@+id/etRegisterPassword"
@@ -216,7 +234,7 @@
             android:textColor="@color/dark_gray"
             android:padding="6dp"
             android:textSize="16sp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="5dp"/>
 
         <EditText
             android:id="@+id/etRegisterConfirmPassword"
@@ -237,7 +255,8 @@
             android:layout_marginRight="70dp"
             android:text="Register"
             android:layout_below="@+id/etRegisterConfirmPassword"
-            android:layout_marginTop="50dp"/>
+            android:layout_marginTop="30dp"
+            android:backgroundTint="@color/teal_200" />
 
         <ProgressBar
             android:id="@+id/pbRegister"

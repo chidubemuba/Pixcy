@@ -5,13 +5,13 @@ import org.parceler.Parcel;
 
 @Parcel
 public class LocationData{
-    private double longitude;
-    private double latitude;
-    private String address;
-    private String city;
-    private String state;
-    private String postalCode;
-    private String country;
+    public double longitude;
+    public double latitude;
+    public String address;
+    public String city;
+    public String state;
+    public String postalCode;
+    public String country;
 
     public LocationData(){}
 

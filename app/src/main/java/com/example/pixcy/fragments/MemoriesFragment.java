@@ -9,12 +9,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.pixcy.PostsAdapter;
 import com.example.pixcy.databinding.FragmentMemoriesBinding;
 import com.example.pixcy.models.Post;
@@ -22,6 +21,7 @@ import com.example.pixcy.models.User;
 
 import org.parceler.Parcels;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +31,6 @@ import java.util.List;
 public class MemoriesFragment extends Fragment {
 
     private FragmentMemoriesBinding fragmentMemoriesBinding;
-    private SwipeRefreshLayout swipeRefreshLayout;
     public static final String TAG = "MemoriesFragment";
     private List<Post> posts;
     private PostsAdapter adapter;
@@ -46,7 +45,6 @@ public class MemoriesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         fragmentMemoriesBinding = FragmentMemoriesBinding.inflate(getLayoutInflater(), container, false);
         View view = fragmentMemoriesBinding.getRoot();
         return view;
@@ -87,21 +85,15 @@ public class MemoriesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        // Create the adapter
-        adapter = new PostsAdapter(getContext(), posts);
+        adapter = new PostsAdapter(getContext(), posts);        // Create the adapter
 
         // Bind the adapter and layout manager to the RV
         fragmentMemoriesBinding.rvPosts.setLayoutManager(new GridLayoutManager(getContext(), 3));
         fragmentMemoriesBinding.rvPosts.setAdapter(adapter);
         fragmentMemoriesBinding.tvUsername.setText(user.getUsername());
         fragmentMemoriesBinding.tvBio.setText(user.getBio());
-        fragmentMemoriesBinding.ivProfilePicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "This clicks", Toast.LENGTH_SHORT).show();
-                Log.i(TAG, "This clicks");
-            }
-        });
+        Glide.with(getContext())
+                .load(user.getProfile_pic())
+                .into(fragmentMemoriesBinding.ivProfilePicture);
     }
 }

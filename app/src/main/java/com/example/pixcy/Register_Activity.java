@@ -1,20 +1,26 @@
 package com.example.pixcy;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.pixcy.databinding.ActivityRegisterBinding;
+import com.example.pixcy.models.Post;
 import com.example.pixcy.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -27,14 +33,15 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.parceler.Parcels;
 
 import java.util.Calendar;
-import java.util.Objects;
+import java.util.List;
 
 public class Register_Activity extends AppCompatActivity {
 
@@ -43,20 +50,33 @@ public class Register_Activity extends AppCompatActivity {
     private DatePickerDialog picker;
     public static final int MAX_BIO_LENGTH = 180;
     public static final String TAG = "Register_Activity";
+    private final int REQUEST_CODE = 20;
+    private Uri uriImages;
+    private String image_url;
+    FirebaseStorage storage;
+    StorageReference storageRef;
+
+//    private interface GetUriCallback {
+//        void done(Uri uri, Exception e);
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //Set or remove the title
-        getSupportActionBar().setTitle("User Registration");
-
         activityRegisterBinding = ActivityRegisterBinding.inflate(getLayoutInflater());
         View view = activityRegisterBinding.getRoot();
         setContentView(view);
 
-        // TODO: Radio button for gender
+        getSupportActionBar().setTitle("User Registration");
         activityRegisterBinding.rgRegisterGender.clearCheck();
+
+        activityRegisterBinding.ivRegisterProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Register_Activity.this, ProfilePictureActivity.class);
+                startActivityForResult(intent, REQUEST_CODE);
+            }
+        });
 
         // Setting up Date picker on EditText
         activityRegisterBinding.etRegisterDOB.setOnClickListener(new View.OnClickListener() {
@@ -66,7 +86,6 @@ public class Register_Activity extends AppCompatActivity {
                 int day = calendar.get(Calendar.DAY_OF_MONTH);
                 int month = calendar.get(Calendar.MONTH);
                 int year = calendar.get(Calendar.YEAR);
-
                 // Date picker dialog
                 picker = new DatePickerDialog(Register_Activity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
@@ -78,11 +97,9 @@ public class Register_Activity extends AppCompatActivity {
             }
         });
 
-        // function that is carried out when registration button is clicked
         activityRegisterBinding.btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 int selectedGenderId = activityRegisterBinding.rgRegisterGender.getCheckedRadioButtonId();
                 rbRegisterGenderSelected = findViewById(selectedGenderId);
 
@@ -95,9 +112,11 @@ public class Register_Activity extends AppCompatActivity {
                 String textPassword = activityRegisterBinding.etRegisterPassword.getText().toString();
                 String textConfirmPassword = activityRegisterBinding.etRegisterConfirmPassword.getText().toString();
                 String textGender; // Can't obtain the value before verifying if any button was selected or not
+                String textImageUrl = activityRegisterBinding.ivRegisterProfilePic.toString();
 
-                // Check if textFullName is empty and display error message
-                if (TextUtils.isEmpty(textFullName)) {
+                if (TextUtils.isEmpty(textImageUrl)) {
+                    Toast.makeText(Register_Activity.this, "Please select a profile picture", Toast.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(textFullName)) {
                     Toast.makeText(Register_Activity.this, "Please enter your full name", Toast.LENGTH_SHORT).show();
                     activityRegisterBinding.etRegisterFullName.setError("Full name is required");
                     activityRegisterBinding.etRegisterFullName.requestFocus();
@@ -151,25 +170,34 @@ public class Register_Activity extends AppCompatActivity {
                 } else {
                     textGender = rbRegisterGenderSelected.getText().toString();
                     activityRegisterBinding.pbRegister.setVisibility(View.VISIBLE);
-                    registerUser(textFullName, textUsername, textBio, textEmail, textDOB, textGender, textPassword);
+                    registerUser(textFullName, textUsername, textBio, textEmail, textDOB, textGender, textPassword, textImageUrl);
                 }
             }
         });
     }
 
-    // Register User using the credentials given
-    private void registerUser(String textFullName, String textUsername, String textBio, String textEmail, String textDOB, String textGender, String textPassword) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-        // Create User Profile
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+            uriImages = data.getData();
+            image_url = data.getStringExtra("image_url");
+            Log.d(TAG, "Uri: " + uriImages);
+            Log.d(TAG, "Uri String: " + image_url);
+            Glide.with(Register_Activity.this).load(image_url).into(activityRegisterBinding.ivRegisterProfilePic);
+            Log.d(TAG, "Profile pic url: " + activityRegisterBinding.ivRegisterProfilePic.toString());
+        }
+    }
+
+    private void registerUser(String textFullName, String textUsername, String textBio, String textEmail, String textDOB, String textGender, String textPassword, String textImageUrl) {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.createUserWithEmailAndPassword(textEmail, textPassword).addOnCompleteListener(Register_Activity.this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     FirebaseUser firebaseUser = auth.getCurrentUser();
-
-                    // Send Verification Email
-                    firebaseUser.sendEmailVerification();
+                    firebaseUser.sendEmailVerification();                    // Send Verification Email
                     Toast.makeText(Register_Activity.this, "User registered successfully. Please verify your email", Toast.LENGTH_SHORT).show();
 
                     // Update display name of user
@@ -177,9 +205,8 @@ public class Register_Activity extends AppCompatActivity {
                     firebaseUser.updateProfile(profileChangeRequest);
 
                     FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
-
                     // Enter User Data into the Firebase Firestore Database.
-                    User user = new User(textBio, textDOB, textEmail, textGender, textUsername);
+                    User user = new User(textBio, textDOB, textEmail, textGender, textImageUrl, textUsername);
                     firestoredb.collection("users")
                             .document(firebaseUser.getUid())
                             .set(user)
@@ -187,8 +214,6 @@ public class Register_Activity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(Void unused) {
                                     Log.d(TAG, "DocumentSnapshot successfully written!");
-
-                                    // Open User Profile after successful registration
                                     Intent intent = new Intent(Register_Activity.this, MainActivity.class);
                                     // To prevent user from returning back to Register Activity on pressing back button after registration.
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -205,7 +230,6 @@ public class Register_Activity extends AppCompatActivity {
                                     Toast.makeText(Register_Activity.this, "User registered failed. Please try again", Toast.LENGTH_SHORT).show();
                                 }
                             });
-                    // Hide progressBar whether User creation is successful or not.
                     activityRegisterBinding.pbRegister.setVisibility(View.GONE);
 
                 } else {
@@ -225,10 +249,47 @@ public class Register_Activity extends AppCompatActivity {
                         Log.e(TAG, e.getMessage());
                         Toast.makeText(Register_Activity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                    // Hide progressBar whether User creation is successful or not.
                     activityRegisterBinding.pbRegister.setVisibility(View.GONE);
                 }
             }
         });
+    }
+
+    private void UploadPic(FirebaseUser firebaseUser) {
+        if (uriImage != null) {
+            storage = FirebaseStorage.getInstance();
+            storageRef = storage.getReference("ProfilePic");
+            StorageReference fileReference = storageRef.child(firebaseUser.getUid() + "." + getFileExtension(uriImage));
+            fileReference.putFile(uriImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            Uri downloadUri = uri;
+
+                            //Finally set the display image of the user after upload
+                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                    .setPhotoUri(downloadUri).build();
+                            firebaseUser.updateProfile(profileUpdates);
+                            Toast.makeText(Register_Activity.this, "Image upload successful", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(Register_Activity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(Register_Activity.this, "No picture selected", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String getFileExtension(Uri uri) {
+        ContentResolver contentResolver = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 }

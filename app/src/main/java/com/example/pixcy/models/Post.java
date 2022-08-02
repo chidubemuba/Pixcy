@@ -10,10 +10,10 @@ import java.util.Date;
 
 @Parcel
 public class Post {
-    private String description;
-    private String image_url;
-    private @ServerTimestamp Date timestamp;
-    private String user_id;
+    public String description;
+    public String image_url;
+    public @ServerTimestamp Date timestamp;
+    public String user_id;
     public double longitude;
     public double latitude;
     public String address;

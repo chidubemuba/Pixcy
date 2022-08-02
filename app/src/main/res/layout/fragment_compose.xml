@@ -16,11 +16,21 @@
         android:scaleType="fitCenter"
         tools:srcCompat="@tools:sample/avatars" />
 
+    <Button
+        android:id="@+id/btnCaptureImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="70dp"
+        android:layout_marginEnd="70dp"
+        android:text="Take Picture"
+        android:backgroundTint="@color/teal_200" />
+
     <EditText
         android:id="@+id/etDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
         android:ems="10"
         android:gravity="start|top"
         android:hint="@string/description"
@@ -28,17 +38,22 @@
         android:minHeight="48dp" />
 
     <Button
-        android:id="@+id/btnCaptureImage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Take Picture" />
-
-    <Button
         android:id="@+id/btnSubmit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="submit" />
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="70dp"
+        android:layout_marginEnd="70dp"
+        android:text="submit"
+        android:backgroundTint="@color/teal_200" />
+
+    <ProgressBar
+        android:id="@+id/pbSubmit"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:elevation="10dp"
+        android:visibility="gone" />
 
 </LinearLayout>

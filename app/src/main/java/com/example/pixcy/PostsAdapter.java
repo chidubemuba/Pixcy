@@ -2,7 +2,6 @@ package com.example.pixcy;
 
 import android.content.Context;
 import android.content.Intent;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +17,6 @@ import com.example.pixcy.models.Post;
 
 import org.parceler.Parcels;
 
-import java.util.Date;
 import java.util.List;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
@@ -69,17 +67,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         @Override
         public void onClick(View v) {
-            //gets item position
             Toast.makeText(itemView.getContext(), "Post detail",Toast.LENGTH_SHORT).show();
             Log.i(TAG, "onClick: this works ");
-            int position = getAdapterPosition();
+            int position = getAdapterPosition();            //gets item position
             if(position != RecyclerView.NO_POSITION){
                 Post post = posts.get(position);
-                // create intent for the new activity
                 Intent intent = new Intent(context, DetailActivity.class);
-                // serialize the post using parceler, using post as the key
-                intent.putExtra("post", Parcels.wrap(post));
-                // show the activity
+                intent.putExtra("post", Parcels.wrap(post));                // serialize the post using parceler, using post as the key
                 context.startActivity(intent);
             }
         }

@@ -8,127 +8,162 @@
     tools:context=".LoginActivity"
     android:background="@color/Gray">
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="15dp"
         android:layout_margin="15dp"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:padding="10dp">
 
         <TextView
             android:id="@+id/tvLogo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="45dp"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
             android:text="🅟🅘🅧🅒🅨"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textSize="60sp" />
+            android:textSize="60sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tvLoginHead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
+            android:layout_below="@+id/tvLogo"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
             android:text="Please enter your credentials to login"
             android:textAlignment="center"
-            android:layout_below="@+id/tvLogo"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvLogo" />
 
         <TextView
             android:id="@+id/tvLoginEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvLoginHead"
-            android:layout_marginTop="30dp"
-            android:text="Email*"
+            android:layout_marginTop="5dp"
             android:padding="6dp"
+            android:text="Email*"
             android:textColor="#555555"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@+id/tvLoginHead"
+            tools:layout_editor_absoluteX="10dp" />
 
         <EditText
             android:id="@+id/etLoginEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvLoginEmail"
+            android:background="@drawable/border2"
             android:hint="Enter email"
             android:inputType="textEmailAddress"
             android:padding="6dp"
             android:textSize="16sp"
-            android:background="@drawable/border2" />
+            app:layout_constraintTop_toBottomOf="@+id/tvLoginEmail"
+            tools:layout_editor_absoluteX="10dp" />
 
         <TextView
             android:id="@+id/tvLoginPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_below="@+id/etLoginEmail"
-            android:text="Password*"
             android:padding="6dp"
+            android:text="Password*"
             android:textColor="#555555"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@+id/etLoginEmail"
+            tools:layout_editor_absoluteX="10dp" />
 
         <ImageView
             android:id="@+id/ivShowHidePassword"
-            android:layout_width="30dp"
-            android:layout_height="32dp"
-            android:layout_below="@+id/tvLoginPassword" />
+            android:layout_width="32dp"
+            android:layout_height="35dp"
+            android:layout_below="@+id/tvLoginPassword"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvLoginPassword" />
 
         <EditText
             android:id="@+id/etLoginPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvLoginPassword"
-            android:layout_marginStart="30dp"
+            android:layout_marginEnd="34dp"
+            android:background="@drawable/border2"
             android:hint="Enter password"
             android:inputType="textPassword"
             android:padding="6dp"
             android:textSize="16sp"
-            android:background="@drawable/border2" />
-
-        <TextView
-            android:id="@+id/tvForgotPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/etLoginPassword"
-            android:layout_marginTop="20dp"
-            android:padding="6dp"
-            android:text="*Forgot Password? Click Here*"
-            android:textAlignment="center"
-            android:textColor="@color/purple_700"
-            android:textSize="16sp" />
+            app:layout_constraintEnd_toStartOf="@+id/ivShowHidePassword"
+            app:layout_constraintStart_toEndOf="@+id/ivShowHidePassword"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvLoginPassword" />
 
         <Button
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/etLoginPassword"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="80dp"
             android:text="Login"
-            android:layout_below="@+id/tvForgotPassword"
-            android:layout_marginTop="40dp"
-            android:layout_marginRight="70dp"
-            android:layout_marginLeft="70dp" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etLoginPassword"
+            android:backgroundTint="@color/teal_200" />
 
         <Button
             android:id="@+id/btnRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Register"
             android:layout_below="@+id/btnLogin"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="70dp"
-            android:layout_marginLeft="70dp" />
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="80dp"
+            android:text="Register"
+            app:layout_constraintTop_toBottomOf="@+id/btnLogin"
+            tools:layout_editor_absoluteX="10dp"
+            android:backgroundTint="@color/teal_200" />
 
         <ProgressBar
             android:id="@+id/pbLogin"
+            style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:elevation="10dp"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    </RelativeLayout>
+        <TextView
+            android:id="@+id/tvForgotPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btnRegister"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:padding="6dp"
+            android:text="*Forgot Password? Click Here*"
+            android:textAlignment="center"
+            android:textColor="@color/purple_700"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@+id/btnRegister"
+            tools:layout_editor_absoluteX="10dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

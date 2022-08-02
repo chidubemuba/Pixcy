@@ -1,13 +1,11 @@
 package com.example.pixcy.fragments;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.fragment.app.Fragment;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -17,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -25,21 +22,17 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.pixcy.LocationData;
 import com.example.pixcy.R;
 import com.example.pixcy.models.Post;
-import com.example.pixcy.models.User;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +43,6 @@ public class MapsFragment extends Fragment {
 
     /**
      * Request code for location permission request.
-     *
      * @see #onRequestPermissionsResult(int, String[], int[])
      */
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -154,15 +146,12 @@ public class MapsFragment extends Fragment {
 
     private void addMarkers(GoogleMap map) {
         Log.d(TAG, "addMarks ran ");
+        HashMap<String, Integer> postCount = new HashMap<>();
         ArrayList<Post> filteredPosts = new ArrayList<>();
         switch (zoomLevel) {
             case CITY:
-                Set<String> citySet = new HashSet<String>();
                 for (Post post : posts) {
-                    if (!citySet.contains(post.getCity())) {
-                        citySet.add(post.getCity());
                         filteredPosts.add(post);
-                    }
                 }
                 System.out.println("City: " + filteredPosts.get(0));
                 break;
@@ -187,7 +176,9 @@ public class MapsFragment extends Fragment {
                 System.out.println("Country: " + filteredPosts.get(0));
                 break;
             default:
-                // do city
+                for (Post post : posts) {
+                    filteredPosts.add(post);
+                }
                 break;
         }
         map.clear();
@@ -232,7 +223,6 @@ public class MapsFragment extends Fragment {
             public void run() {
                 try {
                     mCustomMarkerView = requireActivity().getLayoutInflater().inflate(R.layout.view_custom_marker, null);
-                    //TextView markerSnippet = (TextView)  mCustomMarkerView.findViewById(R.id.markerSnippet);
                     ImageView markerImageView = (ImageView) mCustomMarkerView.findViewById(R.id.profile_image);
 
                     requireActivity().runOnUiThread(new Runnable() {

@@ -85,8 +85,6 @@ public class ComposeFragment extends Fragment {
     private LocationData locationData;
     public static final String ARG_PARAM1 = "param1";
     public static final String ARG_PARAM2 = "param2";
-
-    // Declare variables for firebase storage and StorageReference
     FirebaseStorage storage;
     StorageReference storageRef;
     StorageReference mountainImagesRef;
@@ -95,11 +93,10 @@ public class ComposeFragment extends Fragment {
         // Required empty public constructor
     }
 
-    // The onCreateView method is called when Fragment should create its View object hierarchy,
+    // The onCreateView method is called when Fragment should create its View object hierarchy
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         fragmentComposeBinding = FragmentComposeBinding.inflate(getLayoutInflater(), container, false);
         View view = fragmentComposeBinding.getRoot();
         return view;
@@ -133,7 +130,6 @@ public class ComposeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         latitude = locationData.getLatitude();
         longitude = locationData.getLongitude();
         address = locationData.getAddress();
@@ -142,12 +138,10 @@ public class ComposeFragment extends Fragment {
         postalCode = locationData.getPostalCode();
         country = locationData.getCountry();
 
-        // Create an instance of FirebaseStorage
         storage = FirebaseStorage.getInstance();
-        // Create a storage reference from our app
         storageRef = storage.getReference();
-        // Create a reference to 'images/mountains.jpg'
-        mountainImagesRef = storageRef.child("images/" + UUID.randomUUID() + ".jpg");
+        mountainImagesRef = storageRef.child("images/" + UUID.randomUUID() + ".jpg");        // Create a reference to 'images/mountains.jpg'
+
         ExecutorService executorService = Executors.newSingleThreadExecutor();
 
         fragmentComposeBinding.btnCaptureImage.setOnClickListener(new View.OnClickListener() {
@@ -160,6 +154,7 @@ public class ComposeFragment extends Fragment {
         fragmentComposeBinding.btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                fragmentComposeBinding.pbSubmit.setVisibility(View.VISIBLE);
                 description = fragmentComposeBinding.etDescription.getText().toString();
                 if (description.isEmpty()) {
                     Toast.makeText(getContext(), "Description can't be empty", Toast.LENGTH_SHORT).show();
@@ -180,19 +175,14 @@ public class ComposeFragment extends Fragment {
     }
 
     private void launchCamera() {
-        // create Intent to take a picture and return control to the calling application
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Create a File reference for future access
         photoFile = getPhotoFileUri(photoFileName);
 
         // wrap File object into a content provider
         Uri fileProvider = FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID + ".provider", photoFile);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
 
-        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
-        // So as long as the result is not null, it's safe to use the intent.
         if (intent.resolveActivity(getContext().getPackageManager()) != null) {
-            // Start the image capture intent to take photo
             startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
         }
     }
@@ -203,11 +193,8 @@ public class ComposeFragment extends Fragment {
 
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                // by this point we have the camera photo on disk
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                // Rotate the Bitmap picture
                 Bitmap correctImage = rotateBitmapOrientation(takenImage);
-                // Load the taken image into a preview
                 fragmentComposeBinding.ivPostImage.setImageBitmap(correctImage);
             } else { // Result was a failure
                 Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
@@ -237,7 +224,6 @@ public class ComposeFragment extends Fragment {
         Matrix matrix = new Matrix();
         matrix.setRotate(rotationAngle, (float) bitmap.getWidth() / 2, (float) bitmap.getHeight() / 2);
         Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bounds.outWidth, bounds.outHeight, matrix, true);
-        // Return result
         return rotatedBitmap;
     }
 
@@ -284,7 +270,6 @@ public class ComposeFragment extends Fragment {
                         if (!task.isSuccessful()) {
                             throw task.getException();
                         }
-                        // Continue with the task to get the download URL
                         Log.i(TAG, "result: " + mountainImagesRef.getDownloadUrl());
                         return mountainImagesRef.getDownloadUrl();
                     }
@@ -295,10 +280,9 @@ public class ComposeFragment extends Fragment {
                             Uri downloadUri = task.getResult();
                             image_url = downloadUri.toString();
                             Log.i(TAG, "result check: " + downloadUri);
-                            // Create a post object with the image url and all the required posts documents to the posts collection
                             createPost(address, city, country, description, image_url, latitude, longitude, postalCode, state, userId);
+                            fragmentComposeBinding.pbSubmit.setVisibility(View.GONE);
                         } else {
-                            // Handle failures
                             Log.e(TAG, "Failed to get Uri");
                         }
                     }
@@ -311,8 +295,6 @@ public class ComposeFragment extends Fragment {
     public void createPost(String address, String city, String country, String description, String image_url,
                            double latitude, double longitude, String postalCode, String state, String userId) {
         FirebaseFirestore firestoredb = FirebaseFirestore.getInstance();
-
-        // Create a reference to the posts collection where we will be inserting the data
         DocumentReference newPostReference = firestoredb.collection("posts").document();
 
         // Date timestamp
@@ -332,9 +314,7 @@ public class ComposeFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-//                    Toast.makeText(getContext(), "Created newPostReference post", Toast.LENGTH_SHORT).show();
                 } else {
-//                    Toast.makeText(getContext(), "Post failed", Toast.LENGTH_SHORT).show();
                 }
             }
         });

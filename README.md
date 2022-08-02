@@ -42,7 +42,7 @@ This app allows the user to sign up or log into their account using Facebook. Us
 **Optional Nice-to-have features**
 * [x] Improve the runtime speed of my application as a complex feature.
 * [x] Newly taken pictures will be automatically inserted into the user own memories page without relying on a manual refresh.
-* [ ] Improve user interface by experimenting with styling and coloring as well as applying rounded corners for the image post using glide transformation
+* [x] Improve user interface by experimenting with styling and coloring as well as applying rounded corners for the image post using glide transformation
 * [ ] Allow user to make, upload videos, and view videos on their feed.
 * [ ] Allow the logged in user to add a profile photo
 * [x] Display the user's post in a cardview layout

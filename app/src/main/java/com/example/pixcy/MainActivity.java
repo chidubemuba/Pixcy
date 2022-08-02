@@ -10,7 +10,6 @@ import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -21,7 +20,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -34,19 +32,13 @@ import com.example.pixcy.models.Post;
 import com.example.pixcy.models.User;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.parceler.Parcels;
@@ -85,18 +77,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
+        View view = activityMainBinding.getRoot();
+        setContentView(view);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         Intent intent = getIntent();
         userId = intent.getStringExtra("userId");
         user = Parcels.unwrap(intent.getParcelableExtra("user"));
-//        System.out.println("user information: " + user.getUsername() + ", " + user.getEmail() + "," + user.getDob());
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-        activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
-        View view = activityMainBinding.getRoot();
-        setContentView(view);
 
         // Location runtime permissions
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -204,10 +194,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);
         }
-//        else if (id == R.id.action_update_email) {
-//            Intent intent = new Intent(MainActivity.this, UpdateEmailActivity.class);
-//            startActivity(intent);
-//        }
         else if (id == R.id.action_logout) {
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -237,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                     // Here 1 represent max location result to returned, by documents it recommended 1 to 5
                                     List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
                                     if (addresses != null && addresses.size() > 0) {
-                                        address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                                        address = addresses.get(0).getAddressLine(0);
                                         city = addresses.get(0).getLocality();
                                         state = addresses.get(0).getAdminArea();
                                         postalCode = addresses.get(0).getPostalCode();
