@@ -86,7 +86,9 @@ This app allows the user to sign up or log into their account using Facebook. Us
   * Compose -> Memories
 
 ## Wireframes
+
  * [Link to wireframe](https://www.figma.com/file/ms5OgcKA0x5n8AORNSbOE5/Untitled?node-id=0%3A1)
+ * Here's a walkthrough of implemented user stories: https://youtu.be/s-LumZ7oFFI 
 
 <!--## Schema 
 [This section will be completed in Unit 9]
